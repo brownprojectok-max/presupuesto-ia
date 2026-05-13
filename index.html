@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PresupuestoIA — Automatización Inteligente</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0a0a0f;
+    --paper: #f5f2ec;
+    --accent: #d4500a;
+    --accent2: #1a3a5c;
+    --muted: #888;
+    --border: #d8d4cc;
+    --card: #fffefb;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    /* más espacio entre líneas en todo el documento */
+    line-height: 1.7;
+  }
+
+  /* HEADER */
+  header {
+    padding: 22px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1.5px solid var(--border);
+    background: var(--paper);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.4rem;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+  .logo span { color: var(--accent); }
+
+  .badge {
+    background: var(--accent);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 500;
+    padding: 4px 12px;
+    border-radius: 20px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  /* HERO */
+  .hero {
+    padding: 88px 48px 64px;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  .hero-tag {
+    display: inline-block;
+    border: 1.5px solid var(--accent);
+    color: var(--accent);
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 3px;
+    margin-bottom: 32px;
+    line-height: 1;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2.6rem, 5.5vw, 4rem);
+    font-weight: 800;
+    line-height: 1.12;
+    letter-spacing: -0.04em;
+    margin-bottom: 24px;
+    max-width: 680px;
+  }
+
+  h1 em {
+    font-style: normal;
+    color: var(--accent);
+  }
+
+  .hero-sub {
+    color: #555;
+    font-size: 1.08rem;
+    line-height: 1.75;
+    max-width: 500px;
+    margin-bottom: 44px;
+    font-weight: 300;
+  }
+
+  /* STATS */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    max-width: 960px;
+    margin: 0 auto 44px;
+    padding: 0 48px;
+  }
+
+  .stat {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 22px 24px 20px;
+  }
+
+  .stat-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .stat-label {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* DEMO AREA */
+  .demo-container {
+    max-width: 960px;
+    margin: 0 auto 88px;
+    padding: 0 48px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  .panel {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 30px;
+  }
+
+  .panel-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 22px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    line-height: 1;
+  }
+
+  .panel-title .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+  }
+
+  /* FORM */
+  .form-group { margin-bottom: 18px; }
+
+  label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: #444;
+    margin-bottom: 7px;
+    line-height: 1.4;
+  }
+
+  input, select, textarea {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: var(--paper);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.2s;
+    line-height: 1.5;
+  }
+
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+
+  textarea { resize: vertical; min-height: 96px; }
+
+  .btn-primary {
+    width: 100%;
+    padding: 15px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    line-height: 1;
+  }
+
+  .btn-primary:hover { background: #b84208; transform: translateY(-1px); }
+  .btn-primary:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+
+  /* LOADER */
+  .loader {
+    display: none;
+    text-align: center;
+    padding: 48px;
+    grid-column: 1 / -1;
+  }
+  .loader.visible { display: block; }
+
+  .loader-ring {
+    width: 44px; height: 44px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 18px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loader-text { font-size: 0.92rem; color: var(--muted); font-weight: 300; line-height: 1.6; }
+  .loader-steps { margin-top: 10px; font-size: 0.8rem; color: var(--accent); font-weight: 500; height: 22px; }
+
+  /* OUTPUT */
+  .output-panel { grid-column: 1 / -1; display: none; }
+  .output-panel.visible { display: block; }
+
+  .presupuesto-result {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 40px;
+  }
+
+  .presupuesto-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 1.5px solid var(--border);
+    padding-bottom: 28px;
+    margin-bottom: 28px;
+    gap: 20px;
+  }
+
+  .presupuesto-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+    margin-bottom: 6px;
+  }
+
+  .presupuesto-num {
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-top: 4px;
+  }
+
+  .presupuesto-resumen {
+    font-size: 0.9rem;
+    color: #555;
+    line-height: 1.65;
+    margin-top: 6px;
+  }
+
+  .presupuesto-badge {
+    background: #e8f5e9;
+    color: #2e7d32;
+    padding: 7px 16px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    border: 1px solid #a5d6a7;
+    white-space: nowrap;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .partidas {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 24px;
+  }
+
+  .partidas th {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: var(--muted);
+    text-align: left;
+    padding: 8px 12px 10px;
+    border-bottom: 1.5px solid var(--border);
+    line-height: 1.4;
+  }
+
+  .partidas td {
+    padding: 14px 12px;
+    font-size: 0.9rem;
+    border-bottom: 1px solid #eee;
+    vertical-align: top;
+    line-height: 1.55;
+  }
+
+  .partidas tr:last-child td { border-bottom: none; }
+
+  .partidas .cat { font-weight: 500; }
+  .partidas .desc { color: #888; font-size: 0.82rem; margin-top: 2px; }
+  .partidas .amount { text-align: right; font-weight: 500; font-family: 'Syne', sans-serif; }
+
+  .totales {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+    font-size: 0.9rem;
+    margin-bottom: 16px;
+  }
+
+  .totales .fila {
+    display: flex;
+    gap: 48px;
+    color: #555;
+    line-height: 1.4;
+  }
+
+  .total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--ink);
+    color: white;
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin-top: 8px;
+  }
+
+  .total-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0.65;
+    line-height: 1;
+  }
+
+  .total-amount {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+
+  .meta-row {
+    display: flex;
+    gap: 36px;
+    font-size: 0.82rem;
+    color: #777;
+    margin-top: 18px;
+    line-height: 1.6;
+  }
+
+  .ai-nota {
+    background: #fff8f5;
+    border: 1px solid #ffd8c4;
+    border-radius: 8px;
+    padding: 18px 20px;
+    margin-top: 22px;
+    font-size: 0.88rem;
+    line-height: 1.75;
+    color: #555;
+  }
+
+  .ai-nota strong { color: var(--accent); }
+
+  .action-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 22px;
+  }
+
+  .btn-sec {
+    flex: 1;
+    padding: 13px 10px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.86rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+
+  .btn-sec:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* INTEGRACIONES */
+  .integraciones {
+    margin-top: 24px;
+    padding: 18px;
+    background: #f0f4ff;
+    border-radius: 8px;
+    border: 1px solid #c5d3f5;
+  }
+
+  .integraciones-title {
+    font-size: 0.78rem;
+    color: #2d4a8a;
+    font-weight: 600;
+    margin-bottom: 10px;
+    line-height: 1.4;
+  }
+
+  .integraciones-list {
+    font-size: 0.78rem;
+    color: #555;
+    line-height: 2;
+  }
+
+  footer {
+    border-top: 1.5px solid var(--border);
+    padding: 26px 48px;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 700px) {
+    header { padding: 18px 20px; }
+    .hero { padding: 48px 20px 36px; }
+    h1 { font-size: 2.2rem; line-height: 1.14; }
+    .hero-sub { font-size: 1rem; }
+    .demo-container { padding: 0 20px; grid-template-columns: 1fr; }
+    .stats { padding: 0 20px; grid-template-columns: 1fr 1fr; }
+    .stats .stat:last-child { grid-column: 1 / -1; }
+    .presupuesto-result { padding: 24px; }
+    .presupuesto-header { flex-direction: column; }
+    .action-row { flex-direction: column; }
+    .meta-row { flex-direction: column; gap: 4px; }
+    .partidas th:nth-child(2),
+    .partidas td:nth-child(2),
+    .partidas th:nth-child(3),
+    .partidas td:nth-child(3) { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Presupuesto<span>IA</span></div>
+  <span class="badge">Demo en vivo</span>
+</header>
+
+<section class="hero">
+  <div class="hero-tag">Automatización inteligente · España</div>
+  <h1>Tu presupuesto listo en <em>30 segundos,</em> no en 3 días.</h1>
+  <p class="hero-sub">Describe el proyecto, la IA analiza, calcula y genera un presupuesto profesional al instante. Sin Excel. Sin esperas. Sin errores humanos.</p>
+</section>
+
+<div class="stats">
+  <div class="stat">
+    <div class="stat-num">94%</div>
+    <div class="stat-label">Reducción en tiempo de presupuestación</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">±3%</div>
+    <div class="stat-label">Margen de error vs presupuesto manual</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">0€</div>
+    <div class="stat-label">Coste de esta demo para ti</div>
+  </div>
+</div>
+
+<div class="demo-container">
+
+  <div class="panel">
+    <div class="panel-title"><span class="dot"></span> Datos del proyecto</div>
+    <div class="form-group">
+      <label>Tipo de proyecto</label>
+      <select id="tipo">
+        <option value="">Selecciona...</option>
+        <option value="reforma integral de vivienda">Reforma integral de vivienda</option>
+        <option value="reforma de baño">Reforma de baño</option>
+        <option value="reforma de cocina">Reforma de cocina</option>
+        <option value="construcción de local comercial">Local comercial</option>
+        <option value="instalación eléctrica completa">Instalación eléctrica</option>
+        <option value="pintura y acabados interiores">Pintura y acabados</option>
+        <option value="obra nueva residencial">Obra nueva residencial</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Superficie (m²)</label>
+      <input type="number" id="m2" placeholder="Ej: 85" min="1">
+    </div>
+    <div class="form-group">
+      <label>Ciudad / Provincia</label>
+      <input type="text" id="ciudad" placeholder="Ej: Madrid, Barcelona, Sevilla...">
+    </div>
+    <div class="form-group">
+      <label>Calidad de los materiales</label>
+      <select id="calidad">
+        <option value="estándar">Estándar (económica)</option>
+        <option value="media-alta" selected>Media-alta (recomendada)</option>
+        <option value="premium">Premium (lujo)</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Detalles adicionales (opcional)</label>
+      <textarea id="detalles" placeholder="Ej: suelo de parquet, ventanas de aluminio con doble acristalamiento, cocina abierta..."></textarea>
+    </div>
+    <button class="btn-primary" id="generar-btn" onclick="generarPresupuesto()">
+      <span>⚡</span> Generar presupuesto con IA
+    </button>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title"><span class="dot"></span> Datos del cliente</div>
+    <div class="form-group">
+      <label>Nombre o empresa</label>
+      <input type="text" id="cliente" placeholder="Ej: María García / Reformas López S.L.">
+    </div>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="email" placeholder="cliente@email.com">
+    </div>
+    <div class="form-group">
+      <label>Teléfono</label>
+      <input type="tel" id="telefono" placeholder="+34 600 000 000">
+    </div>
+    <div class="form-group">
+      <label>Plazo deseado de ejecución</label>
+      <select id="plazo">
+        <option value="urgente (menos de 1 mes)">Urgente (menos de 1 mes)</option>
+        <option value="normal (1-3 meses)" selected>Normal (1-3 meses)</option>
+        <option value="flexible (más de 3 meses)">Flexible (más de 3 meses)</option>
+      </select>
+    </div>
+    <div class="integraciones">
+      <div class="integraciones-title">🔗 Integraciones activas</div>
+      <div class="integraciones-list">
+        ✅ Envío automático por email<br>
+        ✅ WhatsApp al aceptar<br>
+        ✅ PDF descargable<br>
+        ✅ Base de datos BIM (Presto)<br>
+        ✅ Factura en 1 clic (Quipu)
+      </div>
+    </div>
+  </div>
+
+  <div class="loader" id="loader">
+    <div class="loader-ring"></div>
+    <div class="loader-text">La IA está analizando tu proyecto...</div>
+    <div class="loader-steps" id="loader-step"></div>
+  </div>
+
+  <div class="output-panel" id="output">
+    <div class="presupuesto-result" id="presupuesto-content"></div>
+  </div>
+
+</div>
+
+<footer>
+  PresupuestoIA · Demo interactiva · Powered by Claude AI · © 2025
+</footer>
+
+<script>
+const STEPS = [
+  "Analizando tipo de proyecto...",
+  "Consultando precios de mercado en tu zona...",
+  "Calculando partidas y materiales...",
+  "Aplicando márgenes y IVA...",
+  "Generando documento profesional...",
+];
+
+async function generarPresupuesto() {
+  const tipo = document.getElementById('tipo').value;
+  const m2 = document.getElementById('m2').value;
+  const ciudad = document.getElementById('ciudad').value;
+  const calidad = document.getElementById('calidad').value;
+  const detalles = document.getElementById('detalles').value;
+  const cliente = document.getElementById('cliente').value || "Cliente";
+  const plazo = document.getElementById('plazo').value;
+
+  if (!tipo || !m2 || !ciudad) {
+    alert("Por favor rellena al menos: tipo de proyecto, superficie y ciudad.");
+    return;
+  }
+
+  const btn = document.getElementById('generar-btn');
+  btn.disabled = true;
+  document.getElementById('loader').classList.add('visible');
+  document.getElementById('output').classList.remove('visible');
+
+  let stepIdx = 0;
+  const stepEl = document.getElementById('loader-step');
+  stepEl.textContent = STEPS[0];
+  const stepInterval = setInterval(() => {
+    stepIdx = (stepIdx + 1) % STEPS.length;
+    stepEl.textContent = STEPS[stepIdx];
+  }, 1200);
+
+  const prompt = `Eres un experto en presupuestos de construcción y reformas en España.
+
+Genera un presupuesto profesional detallado para:
+- Tipo de proyecto: ${tipo}
+- Superficie: ${m2} m²
+- Ciudad: ${ciudad}
+- Calidad de materiales: ${calidad}
+- Plazo: ${plazo}
+- Detalles adicionales: ${detalles || "ninguno"}
+
+Responde SOLO con un JSON válido, sin texto adicional, sin markdown, sin backticks. El JSON debe tener exactamente esta estructura:
+{
+  "titulo": "Título del presupuesto",
+  "numero": "PRE-2025-XXXX",
+  "resumen": "Una frase describiendo el proyecto",
+  "partidas": [
+    { "categoria": "Nombre categoría", "descripcion": "Descripción breve", "unidad": "m²", "cantidad": 85, "precio_unitario": 45, "total": 3825 }
+  ],
+  "subtotal": 12000,
+  "iva": 2520,
+  "total": 14520,
+  "plazo_estimado": "X semanas",
+  "nota_ia": "Observación técnica útil de 2-3 frases sobre este tipo de proyecto en ${ciudad}, precios de mercado actuales, y algún consejo práctico.",
+  "validez": "30 días"
+}
+
+Incluye entre 5 y 8 partidas realistas con precios de mercado español actual para ${ciudad}. El total debe ser coherente con ${m2}m² de ${tipo} en calidad ${calidad}.`;
+
+  try {
+    const response = await fetch('/api/ai', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1000,
+        messages: [{ role: "user", content: prompt }]
+      })
+    });
+
+    const data = await response.json();
+    const text = data.content.map(i => i.text || "").join("");
+    const clean = text.replace(/```json|```/g, "").trim();
+    const presupuesto = JSON.parse(clean);
+
+    clearInterval(stepInterval);
+    document.getElementById('loader').classList.remove('visible');
+    renderPresupuesto(presupuesto, cliente);
+
+  } catch (err) {
+    clearInterval(stepInterval);
+    document.getElementById('loader').classList.remove('visible');
+    document.getElementById('output').classList.add('visible');
+    document.getElementById('presupuesto-content').innerHTML = `
+      <div style="padding:40px; text-align:center; color:#c0392b;">
+        <div style="font-size:2rem; margin-bottom:12px;">⚠️</div>
+        <div style="font-weight:600; font-size:1rem; margin-bottom:8px;">Error al generar el presupuesto</div>
+        <div style="font-size:0.85rem; color:#888; line-height:1.6;">${err.message}</div>
+      </div>`;
+  }
+
+  btn.disabled = false;
+}
+
+function renderPresupuesto(p, cliente) {
+  const fmt = n => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+  const today = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' });
+  const numRef = p.numero || ("PRE-2025-" + Math.floor(Math.random() * 9000 + 1000));
+
+  const filas = (p.partidas || []).map(pt => `
+    <tr>
+      <td><div class="cat">${pt.categoria}</div><div class="desc">${pt.descripcion}</div></td>
+      <td>${pt.unidad || 'ud'}</td>
+      <td style="text-align:right">${pt.cantidad}</td>
+      <td style="text-align:right">${fmt(pt.precio_unitario)}</td>
+      <td class="amount">${fmt(pt.total)}</td>
+    </tr>
+  `).join('');
+
+  document.getElementById('presupuesto-content').innerHTML = `
+    <div class="presupuesto-header">
+      <div>
+        <div class="presupuesto-title">${p.titulo}</div>
+        <div class="presupuesto-num">${numRef} · ${today} · ${cliente}</div>
+        <div class="presupuesto-resumen">${p.resumen}</div>
+      </div>
+      <span class="presupuesto-badge">✓ Generado por IA</span>
+    </div>
+
+    <table class="partidas">
+      <thead>
+        <tr>
+          <th>Partida</th>
+          <th>Ud.</th>
+          <th style="text-align:right">Cant.</th>
+          <th style="text-align:right">€/ud</th>
+          <th style="text-align:right">Total</th>
+        </tr>
+      </thead>
+      <tbody>${filas}</tbody>
+    </table>
+
+    <div class="totales">
+      <div class="fila"><span>Subtotal (sin IVA)</span><span style="font-weight:500">${fmt(p.subtotal)}</span></div>
+      <div class="fila"><span>IVA (21%)</span><span style="font-weight:500">${fmt(p.iva)}</span></div>
+    </div>
+
+    <div class="total-row">
+      <span class="total-label">Total presupuesto</span>
+      <span class="total-amount">${fmt(p.total)}</span>
+    </div>
+
+    <div class="meta-row">
+      <span>📅 Plazo estimado: <strong>${p.plazo_estimado}</strong></span>
+      <span>⏱ Validez: <strong>${p.validez}</strong></span>
+    </div>
+
+    <div class="ai-nota">
+      <strong>💡 Análisis IA:</strong> ${p.nota_ia}
+    </div>
+
+    <div class="action-row">
+      <button class="btn-sec" onclick="window.print()">🖨️ Imprimir PDF</button>
+      <button class="btn-sec" onclick="simularWhatsApp()">💬 WhatsApp</button>
+      <button class="btn-sec" onclick="simularEmail()">📧 Enviar email</button>
+    </div>
+  `;
+
+  document.getElementById('output').classList.add('visible');
+  document.getElementById('output').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function simularWhatsApp() {
+  alert("✅ Presupuesto enviado por WhatsApp al cliente.\n\n(En producción: integración con WhatsApp Business API)");
+}
+function simularEmail() {
+  const email = document.getElementById('email').value;
+  alert(email
+    ? `✅ Presupuesto enviado a ${email}\n\n(En producción: integración con SendGrid)`
+    : "Introduce un email en el formulario del cliente primero.");
+}
+</script>
+</body>
+</html>
