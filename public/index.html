@@ -4,34 +4,34 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PresupuestoIA</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+
 <style>
-:root{--ink:#0a0a0f;--paper:#f5f2ec;--accent:#d4500a;--muted:#888;--border:#d8d4cc;--card:#fffefb}
+:root{--ink:#363955;--paper:#F5F6E6;--accent:#54668E;--accent2:#59598E;--muted:#879EC6;--border:#d0d4e0;--card:#ffffff;--light:#E8E8E8}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;line-height:1.7}
-header{padding:22px 48px;display:flex;justify-content:space-between;align-items:center;border-bottom:1.5px solid var(--border);background:var(--paper);position:sticky;top:0;z-index:100}
-.logo{font-family:'Instrument Serif',serif;font-weight:400;font-size:1.6rem;letter-spacing:-0.01em;line-height:1}
-.logo span{color:var(--accent)}
+body{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;line-height:1.7}
+header{padding:22px 48px;display:flex;justify-content:space-between;align-items:center;border-bottom:1.5px solid var(--border);background:var(--paper);position:sticky;top:0;z-index:100;box-shadow:0 1px 0 var(--border)}
+.logo{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:400;font-size:1.6rem;letter-spacing:-0.01em;line-height:1}
+.logo span{color:var(--accent2)}
 .badge{background:var(--accent);color:white;font-size:0.7rem;font-weight:500;padding:4px 12px;border-radius:20px;letter-spacing:0.06em;text-transform:uppercase}
 .main{max-width:880px;margin:0 auto;padding:56px 48px 88px}
 .steps-bar{display:flex;align-items:center;margin-bottom:48px}
 .step-item{display:flex;align-items:center;gap:10px}
-.step-num{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.85rem;font-weight:700;border:2px solid var(--border);color:var(--muted);background:var(--paper);transition:all 0.3s;flex-shrink:0}
-.step-num.active{background:var(--accent);border-color:var(--accent);color:white}
-.step-num.done{background:var(--ink);border-color:var(--ink);color:white}
+.step-num{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:0.85rem;font-weight:700;border:2px solid var(--border);color:var(--muted);background:var(--paper);transition:all 0.3s;flex-shrink:0}
+.step-num.active{background:var(--accent2);border-color:var(--accent2);color:white}
+.step-num.done{background:var(--accent);border-color:var(--accent);color:white}
 .step-label{font-size:0.82rem;font-weight:500;color:var(--muted);transition:color 0.3s}
 .step-label.active{color:var(--ink)}
 .step-div{flex:1;height:1.5px;background:var(--border);margin:0 16px;max-width:80px}
-h2{font-family:'Instrument Serif',serif;font-size:1.9rem;font-weight:400;letter-spacing:-0.01em;margin-bottom:8px;line-height:1.15;font-style:italic}
+h2{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:1.9rem;font-weight:400;letter-spacing:-0.01em;margin-bottom:8px;line-height:1.15;font-style:italic}
 .subtitle{color:#666;font-size:0.95rem;margin-bottom:32px;line-height:1.6}
 .panel{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:28px 32px;margin-bottom:20px}
-.panel-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:20px;display:flex;align-items:center;gap:8px}
-.dot{width:7px;height:7px;border-radius:50%;background:var(--accent);flex-shrink:0}
+.panel-title{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:20px;display:flex;align-items:center;gap:8px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--accent2);flex-shrink:0}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
 .fg{margin-bottom:16px}
 label{display:block;font-size:0.82rem;font-weight:500;color:#444;margin-bottom:7px}
-input,select,textarea{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:8px;background:var(--paper);font-family:'Plus Jakarta Sans',sans-serif;font-size:0.9rem;color:var(--ink);outline:none;transition:border-color 0.2s;line-height:1.5}
+input,select,textarea{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:8px;background:var(--paper);font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:0.9rem;color:var(--ink);outline:none;transition:border-color 0.2s;line-height:1.5}
 input:focus,select:focus,textarea:focus{border-color:var(--accent)}
 textarea{resize:vertical;min-height:80px}
 .pt{width:100%;border-collapse:collapse}
@@ -40,32 +40,32 @@ textarea{resize:vertical;min-height:80px}
 .pt tr:last-child td{border-bottom:none}
 .pt input[type=number]{width:88px;padding:7px 10px;text-align:right;font-size:0.88rem;border:1.5px solid var(--border);border-radius:6px;background:var(--paper)}
 .pt input[type=number]:focus{border-color:var(--accent)}
-.pt .tr{text-align:right;font-weight:500;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.9rem}
+.pt .tr{text-align:right;font-weight:500;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:0.9rem}
 .pt .zero td{opacity:0.35}
 .cat-hdr td{background:#f5f2ec!important;font-size:0.72rem!important;font-weight:700!important;letter-spacing:0.1em!important;text-transform:uppercase!important;color:#666!important;padding:8px 12px!important;border-bottom:none!important}
 .totbar{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:24px 32px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center}
 .totdes{display:flex;flex-direction:column;gap:6px;font-size:0.88rem;color:#666}
 .totdes span strong{color:var(--ink)}
-.totbig{font-family:'Plus Jakarta Sans',sans-serif;font-size:1.9rem;font-weight:800;letter-spacing:-0.03em;color:var(--ink);line-height:1}
+.totbig{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:1.9rem;font-weight:800;letter-spacing:-0.03em;color:var(--ink);line-height:1}
 .tot-lbl{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:4px}
-.btn{padding:14px 32px;background:var(--accent);color:white;border:none;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:8px;line-height:1}
-.btn:hover{background:#b84208;transform:translateY(-1px)}
+.btn{padding:14px 32px;background:var(--accent);color:white;border:none;border-radius:8px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:8px;line-height:1}
+.btn:hover{background:var(--accent2);transform:translateY(-1px)}
 .btn:disabled{background:#ccc;cursor:not-allowed;transform:none}
-.btn2{padding:14px 24px;border:1.5px solid var(--border);border-radius:8px;background:white;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.9rem;font-weight:500;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:6px;color:var(--ink)}
+.btn2{padding:14px 24px;border:1.5px solid var(--border);border-radius:8px;background:white;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:0.9rem;font-weight:500;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:6px;color:var(--ink)}
 .btn2:hover{border-color:var(--accent);color:var(--accent)}
 .brow{display:flex;gap:12px;justify-content:flex-end;margin-top:24px;align-items:center}
 .loader{text-align:center;padding:48px}
 .ring{width:44px;height:44px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 18px}
 @keyframes spin{to{transform:rotate(360deg)}}
 .ltxt{font-size:0.92rem;color:var(--muted);font-weight:300}
-.lstep{margin-top:10px;font-size:0.8rem;color:var(--accent);font-weight:500;height:22px}
+.lstep{margin-top:10px;font-size:0.8rem;color:var(--accent2);font-weight:500;height:22px}
 .ph{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px;gap:20px}
-.ptitle{font-family:'Plus Jakarta Sans',sans-serif;font-size:1.5rem;font-weight:800;letter-spacing:-0.03em;line-height:1.2;margin-bottom:6px}
+.ptitle{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:1.5rem;font-weight:800;letter-spacing:-0.03em;line-height:1.2;margin-bottom:6px}
 .pmeta{font-size:0.8rem;color:var(--muted);line-height:1.7}
 .pbadge{background:#e8f5e9;color:#2e7d32;padding:7px 16px;border-radius:20px;font-size:0.78rem;font-weight:500;border:1px solid #a5d6a7;white-space:nowrap;flex-shrink:0}
 .totdark{display:flex;justify-content:space-between;align-items:center;background:var(--ink);color:white;border-radius:8px;padding:18px 22px;margin-top:8px}
-.ainota{background:#fff8f5;border:1px solid #ffd8c4;border-radius:8px;padding:18px 20px;margin-top:22px;font-size:0.88rem;line-height:1.75;color:#555}
-.ainota strong{color:var(--accent)}
+.ainota{background:#f0f3f9;border:1px solid #c5cedf;border-radius:8px;padding:18px 20px;margin-top:22px;font-size:0.88rem;line-height:1.75;color:#555}
+.ainota strong{color:var(--accent2)}
 .arow{display:flex;gap:12px;margin-top:20px}
 .arow .btn2{flex:1;justify-content:center}
 footer{border-top:1.5px solid var(--border);padding:24px 48px;text-align:center;font-size:0.8rem;color:var(--muted)}
@@ -373,9 +373,9 @@ TITULO: nombre profesional corto. RESUMEN: 1 frase. PLAZO: semanas. NOTA: 2 fras
     for(const [cat,ids] of Object.entries(CATS)){
       const inc=ids.filter(id=>byId[id]); if(!inc.length) continue;
       filas+=`<tr><td colspan="4" style="background:#f5f2ec;font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#666;padding:8px 12px">${cat}</td></tr>`;
-      inc.forEach(id=>{const l=byId[id];done.add(id);filas+=`<tr><td style="padding:12px">${l.nombre}</td><td style="padding:12px;color:#888;font-size:0.82rem">${l.cantidad} ${l.unidad}</td><td style="padding:12px;text-align:right;color:#555">${fmt(l.precio)}</td><td style="padding:12px;text-align:right;font-weight:500;font-family:'Plus Jakarta Sans',sans-serif">${fmt(l.total)}</td></tr>`;});
+      inc.forEach(id=>{const l=byId[id];done.add(id);filas+=`<tr><td style="padding:12px">${l.nombre}</td><td style="padding:12px;color:#888;font-size:0.82rem">${l.cantidad} ${l.unidad}</td><td style="padding:12px;text-align:right;color:#555">${fmt(l.precio)}</td><td style="padding:12px;text-align:right;font-weight:500;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif">${fmt(l.total)}</td></tr>`;});
     }
-    lineas.filter(l=>!done.has(l.id)).forEach(l=>{filas+=`<tr><td style="padding:12px">${l.nombre}</td><td style="padding:12px;color:#888;font-size:0.82rem">${l.cantidad} ${l.unidad}</td><td style="padding:12px;text-align:right;color:#555">${fmt(l.precio)}</td><td style="padding:12px;text-align:right;font-weight:500;font-family:'Plus Jakarta Sans',sans-serif">${fmt(l.total)}</td></tr>`;});
+    lineas.filter(l=>!done.has(l.id)).forEach(l=>{filas+=`<tr><td style="padding:12px">${l.nombre}</td><td style="padding:12px;color:#888;font-size:0.82rem">${l.cantidad} ${l.unidad}</td><td style="padding:12px;text-align:right;color:#555">${fmt(l.precio)}</td><td style="padding:12px;text-align:right;font-weight:500;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif">${fmt(l.total)}</td></tr>`;});
 
     document.getElementById('presresult').innerHTML=`
 <div class="panel">
@@ -397,8 +397,8 @@ TITULO: nombre profesional corto. RESUMEN: 1 frase. PLAZO: semanas. NOTA: 2 fras
     <div style="display:flex;gap:48px;color:#555"><span>IVA (21%)</span><span style="font-weight:500">${fmt(iva)}</span></div>
   </div>
   <div class="totdark">
-    <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:0.82rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;opacity:0.65">Total presupuesto</span>
-    <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.8rem;font-weight:800;letter-spacing:-0.03em">${fmt(total)}</span>
+    <span style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:0.82rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;opacity:0.65">Total presupuesto</span>
+    <span style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:1.8rem;font-weight:800;letter-spacing:-0.03em">${fmt(total)}</span>
   </div>
   <div style="display:flex;gap:36px;font-size:0.82rem;color:#777;margin-top:18px;line-height:1.6">
     <span>📅 Plazo: <strong>${meta.plazo_estimado}</strong></span>
