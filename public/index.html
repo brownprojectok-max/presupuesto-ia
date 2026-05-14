@@ -247,6 +247,7 @@ function recalc() {
 }
 
 window.back1 = () => { document.getElementById('s2').style.display='none'; document.getElementById('s1').style.display='block'; setStep(1); };
+window.back2 = () => { document.getElementById('s3').style.display='none'; document.getElementById('s2').style.display='block'; setStep(2); };
 
 window.generarPartidas = async () => {
   const tipo=document.getElementById('tipo').value;
@@ -386,7 +387,7 @@ TITULO: nombre profesional corto. RESUMEN: 1 frase. PLAZO: semanas. NOTA: 2 fras
   </div>
   <div class="ainota"><strong>💡 Análisis IA:</strong> ${meta.nota_ia}</div>
   <div class="arow">
-    <button class="btn2" onclick="window.print()">🖨️ PDF</button>
+    <button class="btn2" onclick="back2()">← Editar partidas</button><button class="btn2" onclick="window.print()">🖨️ PDF</button>
     <button class="btn2" onclick="alert('En producción: WhatsApp Business API')">💬 WhatsApp</button>
     <button class="btn2" onclick="alert('En producción: SendGrid email')">📧 Email</button>
     <button class="btn2" onclick="location.reload()">+ Nuevo</button>
