@@ -265,21 +265,9 @@ window.generarPartidas = async () => {
   sel.textContent=STEPS[0];
   const iv=setInterval(()=>{si=(si+1)%STEPS.length;sel.textContent=STEPS[si];},1000);
 
-  const k = cal==='premium'?'premium':cal==='estándar'?'estandar':'media_alta';
-  const plist = Object.entries(DB).map(([id,p])=>`${id}|${p.nombre}|${p.unidad}|${p[k]||p.media_alta}`).join('\n');
+  const ids_disponibles = Object.keys(DB).join(', ');
 
-  const prompt = `Experto en presupuestos de construcción España.
-Proyecto: ${tipo} | ${m2}m² | ${ciudad} | calidad ${cal}
-Detalles: ${det||'ninguno'}
-
-Partidas disponibles (id|nombre|unidad|precio):
-${plist}
-
-Selecciona partidas necesarias y estima cantidades realistas.
-SOLO JSON válido sin markdown:
-{"partidas":[{"id":"demolicion_general","cantidad":85}]}
-
-Solo IDs de la lista. Entre 6 y 12 partidas. Cantidades coherentes con ${m2}m².`;
+  const prompt = `Eres experto en obras y reformas en España. Proyecto: ${tipo}, ${m2}m², ${ciudad}, calidad ${cal}. ${det?'Detalles: '+det:''} IDs disponibles: ${ids_disponibles}. Elige 6-10 IDs relevantes y estima cantidades para ${m2}m². Responde SOLO con JSON: {"partidas":[{"id":"demolicion_general","cantidad":75}]}`;
 
   try {
     const r = await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
