@@ -9,7 +9,7 @@ export default function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: 'API key not configured' });
+  if (!apiKey) return res.status(200).json({ error: 'API key not configured', debug: 'ANTHROPIC_API_KEY is missing' });
 
   const body = JSON.stringify(req.body);
 
@@ -30,14 +30,15 @@ export default function handler(req, res) {
     response.on('data', chunk => data += chunk);
     response.on('end', () => {
       try {
-        res.status(200).json(JSON.parse(data));
+        const parsed = JSON.parse(data);
+        res.status(200).json(parsed);
       } catch (e) {
-        res.status(500).json({ error: 'Parse error' });
+        res.status(200).json({ error: 'Parse error', raw: data.substring(0, 500) });
       }
     });
   });
 
-  request.on('error', (err) => res.status(500).json({ error: err.message }));
+  request.on('error', (err) => res.status(200).json({ error: err.message }));
   request.write(body);
   request.end();
 }
