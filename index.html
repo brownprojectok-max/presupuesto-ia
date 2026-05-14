@@ -685,6 +685,7 @@ Incluye entre 5 y 8 partidas realistas con precios de mercado español actual pa
     });
 
     const data = await response.json();
+    if (data.error) throw new Error(data.error + (data.debug ? " — " + data.debug : "") + (data.raw ? " — " + data.raw : ""));
     const text = data.content.map(i => i.text || "").join("");
     const clean = text.replace(/```json|```/g, "").trim();
     const presupuesto = JSON.parse(clean);
