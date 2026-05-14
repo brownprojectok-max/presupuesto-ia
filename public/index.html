@@ -282,7 +282,7 @@ SOLO JSON válido sin markdown:
 Solo IDs de la lista. Entre 6 y 12 partidas. Cantidades coherentes con ${m2}m².`;
 
   try {
-    const r = await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:600,messages:[{role:'user',content:prompt}]})});
+    const r = await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
     const d = await r.json();
     if(d.type==='error'||!d.content) throw new Error(d.error?.message||'Error IA');
     const text = d.content.map(i=>i.text||'').join('').replace(/```json|```/g,'').trim();
@@ -353,7 +353,7 @@ SOLO JSON válido sin markdown:
 {"titulo":"título profesional","numero":"PRE-2025-XXXX","resumen":"descripción 1 frase","plazo_estimado":"X semanas","validez":"30 días","nota_ia":"análisis técnico 2-3 frases para constructora sobre coherencia de precios y consejos"}`;
 
   try {
-    const r=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:500,messages:[{role:'user',content:prompt}]})});
+    const r=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
     const d=await r.json();
     if(d.type==='error'||!d.content) throw new Error(d.error?.message||'Error');
     const text=d.content.map(i=>i.text||'').join('').replace(/```json|```/g,'').trim();
