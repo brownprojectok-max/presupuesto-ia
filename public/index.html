@@ -273,7 +273,7 @@ window.generarPartidas = async () => {
     const r = await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
     const d = await r.json();
     if(d.type==='error'||!d.content) throw new Error(d.error?.message||'Error IA');
-    const raw1=d.content.map(i=>i.text||'').join('').replace(/```json|```/g,'').trim();const js1=raw1.indexOf('[');const je1=raw1.lastIndexOf(']')+1;const arr=JSON.parse(raw1.slice(js1,je1));const parsed={partidas:arr};
+    const raw1=d.content.map(i=>i.text||'').join('').replace(/```json|```/g,'').trim();const js1=raw1.indexOf('[');let depth=0,je1=js1;for(let i=js1;i<raw1.length;i++){if(raw1[i]==='[')depth++;else if(raw1[i]===']'){depth--;if(depth===0){je1=i+1;break;}}}const arr=JSON.parse(raw1.slice(js1,je1));const parsed={partidas:arr};
     clearInterval(iv);
 
     partidas = parsed.partidas.filter(p=>DB[p.id]).map(p=>({
