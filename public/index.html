@@ -270,7 +270,7 @@ window.generarPartidas = async () => {
   const prompt = `Proyecto: ${tipo}, ${m2}m², ${ciudad}, calidad ${cal}. ${det||''} IDs: ${ids_disponibles}. Devuelve SOLO array JSON sin texto: [{"id":"demolicion_general","cantidad":75}]`;
 
   try {
-    const r = await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    const r = await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:400,messages:[{role:'user',content:prompt}]})});
     const d = await r.json();
     if(d.type==='error'||!d.content) throw new Error(d.error?.message||'Error IA');
     const raw1=d.content.map(i=>i.text||'').join('').replace(/```json|```/g,'').trim();const js1=raw1.indexOf('[');let depth=0,je1=js1;for(let i=js1;i<raw1.length;i++){if(raw1[i]==='[')depth++;else if(raw1[i]===']'){depth--;if(depth===0){je1=i+1;break;}}}const arr=JSON.parse(raw1.slice(js1,je1));const parsed={partidas:arr};
@@ -331,16 +331,15 @@ window.generarFinal = async () => {
   document.getElementById('lstep').textContent='Redactando presupuesto profesional...';
   setStep(3);
 
-  const prompt=`Experto en presupuestos construcción España.
-Proyecto: ${tipo} | ${m2}m² | ${ciudad} | ${cal}
-Cliente: ${cliente}
-Total: ${fmt(total)}
+  const numRef = 'PRE-2025-' + String(Math.floor(Math.random()*9000+1000));
+  const prompt=`Responde SOLO con este JSON exacto rellenando los valores, sin explicaciones ni texto extra:
+{"titulo":"AQUI_TITULO","numero":"${numRef}","resumen":"AQUI_RESUMEN","plazo_estimado":"AQUI_PLAZO","validez":"30 días","nota_ia":"AQUI_NOTA"}
 
-SOLO JSON válido sin markdown:
-{"titulo":"título profesional","numero":"PRE-2025-XXXX","resumen":"descripción 1 frase","plazo_estimado":"X semanas","validez":"30 días","nota_ia":"análisis técnico 2-3 frases para constructora sobre coherencia de precios y consejos"}`;
+Datos: ${tipo}, ${m2}m², ${ciudad}, calidad ${cal}, total ${fmt(total)}.
+TITULO: nombre profesional corto. RESUMEN: 1 frase. PLAZO: semanas. NOTA: 2 frases útiles para constructora.`;
 
   try {
-    const r=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    const r=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:400,messages:[{role:'user',content:prompt}]})});
     const d=await r.json();
     if(d.type==='error'||!d.content) throw new Error(d.error?.message||'Error');
     const raw3=d.content.map(i=>i.text||'').join('').replace(/```json|```/g,'').trim();const js3=raw3.indexOf('{');const je3=raw3.lastIndexOf('}')+1;const meta=JSON.parse(raw3.slice(js3,je3));
