@@ -285,8 +285,7 @@ Solo IDs de la lista. Entre 6 y 12 partidas. Cantidades coherentes con ${m2}m².
     const r = await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
     const d = await r.json();
     if(d.type==='error'||!d.content) throw new Error(d.error?.message||'Error IA');
-    const text = d.content.map(i=>i.text||'').join('').replace(/```json|```/g,'').trim();
-    const parsed = JSON.parse(text);
+    const raw1=d.content.map(i=>i.text||'').join('');const js1=raw1.indexOf('{');const je1=raw1.lastIndexOf('}')+1;const parsed=JSON.parse(raw1.slice(js1,je1));
     clearInterval(iv);
 
     partidas = parsed.partidas.filter(p=>DB[p.id]).map(p=>({
@@ -356,8 +355,7 @@ SOLO JSON válido sin markdown:
     const r=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
     const d=await r.json();
     if(d.type==='error'||!d.content) throw new Error(d.error?.message||'Error');
-    const text=d.content.map(i=>i.text||'').join('').replace(/```json|```/g,'').trim();
-    const meta=JSON.parse(text);
+    const raw3=d.content.map(i=>i.text||'').join('');const js3=raw3.indexOf('{');const je3=raw3.lastIndexOf('}')+1;const meta=JSON.parse(raw3.slice(js3,je3));
 
     document.getElementById('sload').style.display='none';
     document.getElementById('s3').style.display='block';
