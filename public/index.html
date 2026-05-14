@@ -267,13 +267,13 @@ window.generarPartidas = async () => {
 
   const ids_disponibles = Object.keys(DB).join(', ');
 
-  const prompt = `Eres experto en obras y reformas en España. Proyecto: ${tipo}, ${m2}m², ${ciudad}, calidad ${cal}. ${det?'Detalles: '+det:''} IDs disponibles: ${ids_disponibles}. Elige 6-10 IDs relevantes y estima cantidades para ${m2}m². Responde SOLO con JSON: {"partidas":[{"id":"demolicion_general","cantidad":75}]}`;
+  const prompt = `Proyecto: ${tipo}, ${m2}m², ${ciudad}, calidad ${cal}. ${det||''} IDs: ${ids_disponibles}. Devuelve SOLO array JSON sin texto: [{"id":"demolicion_general","cantidad":75}]`;
 
   try {
     const r = await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
     const d = await r.json();
     if(d.type==='error'||!d.content) throw new Error(d.error?.message||'Error IA');
-    const raw1=d.content.map(i=>i.text||'').join('');const js1=raw1.indexOf('{');const je1=raw1.lastIndexOf('}')+1;const parsed=JSON.parse(raw1.slice(js1,je1));
+    const raw1=d.content.map(i=>i.text||'').join('').trim();const js1=raw1.indexOf('[');const je1=raw1.lastIndexOf(']')+1;const arr=JSON.parse(raw1.slice(js1,je1));const parsed={partidas:arr};
     clearInterval(iv);
 
     partidas = parsed.partidas.filter(p=>DB[p.id]).map(p=>({
