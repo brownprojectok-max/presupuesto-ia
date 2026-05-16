@@ -167,6 +167,20 @@
               <p style="font-size:0.75rem;color:#999;margin-top:5px">Si el edificio es anterior a 1995 se incluye revisión de bajantes antiguas</p>
             </div>
 
+            <!-- Num viviendas (solo comunidad) -->
+            <div class="field" id="numViviendasField" style="display:none">
+              <label class="field-label" for="numViviendas">Numero de viviendas en el edificio</label>
+              <select id="numViviendas" class="field-input">
+                <option value="4">1-4 viviendas</option>
+                <option value="8">5-8 viviendas</option>
+                <option value="12" selected>9-12 viviendas</option>
+                <option value="18">13-18 viviendas</option>
+                <option value="24">19-24 viviendas</option>
+                <option value="32">Mas de 24 viviendas</option>
+              </select>
+              <p style="font-size:0.75rem;color:#999;margin-top:5px">Usado para calcular el videoportero digital (850 EUR fijo + 190 EUR/vivienda)</p>
+            </div>
+
             <!-- Cambio de distribucion -->
             <div class="field" id="distribucionField" style="display:none">
               <label class="field-label">¿Implica cambio de distribución completa?</label>

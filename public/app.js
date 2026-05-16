@@ -121,6 +121,7 @@ window.goToStep2 = async () => {
 
   const ivaType = parseInt(document.getElementById('ivaType')?.value || '21');
   const numBanos = parseInt(document.getElementById('numBanos')?.value || '1');
+  const numViviendas = parseInt(document.getElementById('numViviendas')?.value || '10');
   const anioConstruccion = parseInt(document.getElementById('anioConstruccion')?.value || '2000');
   const numViviendas = parseInt(document.getElementById('numViviendas')?.value || '8');
   const nivelRampa = document.getElementById('nivelRampa')?.value || 'no';
@@ -206,7 +207,9 @@ window.goToStep2 = async () => {
       split_ac: Math.max(1, Math.round(m2n / 25)),
       aislamiento_sate: m2n,
       limpieza_obra: m2n,
-      bajantes_viejas: 2, // estimado: 1 bajante baño + 1 bajante cocina
+      bajantes_viejas: 2, // estimado: 1 bajante bano + 1 bajante cocina
+      rampa_accesibilidad_cte: 1, // partida alzada — 1 ud por portal
+      instalacion_videoportero: 1, // precio = fijo(850) + variable(190 x num_viviendas) — calculado en Firestore como base
       rampa_accesibilidad_cte: 1, // partida alzada (1 ud independiente del m²)
       instalacion_videoportero: 1, // placa fija + monitores por num_viviendas (campo adicional)
       // Climatización por calidad: split=estandar, conductos+caldera=media_alta, aerotermia=premium
@@ -227,7 +230,7 @@ window.goToStep2 = async () => {
 
     const idsParaTipo = [...(PARTIDAS_FIJAS[tipo] || PARTIDAS_FIJAS['reforma_integral'])];
     // Añadir bajantes viejas si edificio anterior a 1995
-    if (AppState.formData.bajantesAntiguas && ['reforma_integral','reforma_bano','reforma_cocina','obra_nueva'].includes(tipo)) {
+    if (AppState.formData.bajantesAntiguas && ['reforma_integral','obra_nueva'].includes(tipo)) {
       if (!idsParaTipo.includes('bajantes_viejas')) idsParaTipo.push('bajantes_viejas');
     }
     
@@ -284,6 +287,13 @@ window.goToStep2 = async () => {
         if (p.id === 'suelo_radiante_agua' && calidadState !== 'premium') precioUnitario = 0;
         if (p.id === 'aislamiento_acustico' && calidadState === 'estándar') precioUnitario = 0;
         if (p.id === 'foseado_led' && calidadState === 'estándar') precioUnitario = 0;
+        // Videoportero: precio dinamico = 850 fijo + 190 * num_viviendas
+        if (p.id === 'instalacion_videoportero') {
+          const nv = AppState.formData.numViviendas || 10;
+          precioUnitario = 850 + (190 * nv);
+        }
+        // Rampa accesibilidad: partida alzada fija de Firestore (1 ud)
+        if (p.id === 'rampa_accesibilidad_cte') precioUnitario = getPrecio(p.id, calidad);
         // Suelo flotante acustico: premium automatico, media-alta opcional (precio activo siempre que la partida exista)
         if (p.id === 'suelo_flotante_acustico' && calidadState === 'estándar') precioUnitario = 0;
         if (p.id === 'aislamiento_cubierta') precioUnitario = 0; // solo si usuario marca ático
@@ -623,6 +633,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const comInfo = document.getElementById('comunidadInfo');
     if(obraWarn) obraWarn.style.display = tipo === 'obra_nueva' ? 'block' : 'none';
     if(comInfo) comInfo.style.display = tipo === 'comunidad_vecinos' ? 'block' : 'none';
+    // Num viviendas field only for comunidad
+    const numVivField = document.getElementById('numViviendasField');
+    if(numVivField) numVivField.style.display = tipo === 'comunidad_vecinos' ? 'block' : 'none';
     const comCampos = document.getElementById('comunidadCampos');
     if(comCampos) comCampos.style.display = tipo === 'comunidad_vecinos' ? 'block' : 'none';
     // IVA auto para comunidad
