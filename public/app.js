@@ -254,6 +254,7 @@ window.goToStep3 = async () => {
   document.getElementById('budgetCity').textContent = AppState.formData.city;
   document.getElementById('budgetSurface').textContent = AppState.formData.surface + ' m²';
   document.getElementById('budgetDate').textContent = formatDate(new Date());
+  document.getElementById('budgetTotalPreview').textContent = formatCurrency(total);
   document.getElementById('finalSurface').textContent = AppState.formData.surface + ' m²';
   document.getElementById('final-subtotal').textContent = formatCurrency(sub);
   document.getElementById('final-iva').textContent = formatCurrency(iva);

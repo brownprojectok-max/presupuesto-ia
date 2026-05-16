@@ -1112,3 +1112,32 @@ body {
   .navbar-inner { padding: 0 12px; }
   .main-container { padding: 12px; }
 }
+
+/* ── TOTAL EN HEADER CARD ── */
+.budget-total-preview {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255,255,255,0.15);
+}
+.budget-total-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+  margin-bottom: 4px;
+}
+.budget-total-amount {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--gold);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+@media (max-width: 768px) {
+  .budget-total-amount { font-size: 1.6rem; }
+  .budget-header-inner { flex-direction: column; }
+  .budget-header-right { width: 100%; }
+  .budget-total-preview { margin-top: 12px; padding-top: 12px; }
+}
