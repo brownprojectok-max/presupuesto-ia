@@ -236,6 +236,31 @@
               <strong>ℹ️ IVA reducido 10%:</strong> Las reformas en zonas comunes de comunidades de propietarios tributan al 10% cuando la comunidad actúa como consumidor final.
             </div>
 
+            <!-- Campos específicos comunidad -->
+            <div id="comunidadCampos" style="display:none">
+              <div class="field" style="margin-top:12px">
+                <label class="field-label" for="numViviendas">Número de viviendas del edificio</label>
+                <select id="numViviendas" class="field-input">
+                  <option value="4">Hasta 4 viviendas</option>
+                  <option value="8" selected>5-8 viviendas</option>
+                  <option value="12">9-12 viviendas</option>
+                  <option value="18">13-18 viviendas</option>
+                  <option value="24">Más de 18 viviendas</option>
+                </select>
+                <p style="font-size:0.75rem;color:#999;margin-top:4px">Afecta al coste del videoportero digital (850€ placa fija + 190€/vivienda)</p>
+              </div>
+              <div class="field" style="margin-top:12px">
+                <label class="field-label" for="nivelRampa">¿El portal requiere salvar escalones para cota cero?</label>
+                <select id="nivelRampa" class="field-input">
+                  <option value="no">No — ya está a cota cero</option>
+                  <option value="bajo">Sí — 1 o 2 escalones (hasta 2 ml rampa)</option>
+                  <option value="medio" selected>Sí — 3-4 escalones (hasta 4 ml rampa)</option>
+                  <option value="alto">Sí — 5 o más escalones (más de 5 ml rampa)</option>
+                </select>
+                <p style="font-size:0.75rem;color:#999;margin-top:4px">Sin escalones: no se incluye partida de rampa</p>
+              </div>
+            </div>
+
             <!-- Estimate preview -->
             <div class="estimate-preview" id="estimatePreview" style="display:none">
               <div class="estimate-row">

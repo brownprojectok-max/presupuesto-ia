@@ -122,9 +122,11 @@ window.goToStep2 = async () => {
   const ivaType = parseInt(document.getElementById('ivaType')?.value || '21');
   const numBanos = parseInt(document.getElementById('numBanos')?.value || '1');
   const anioConstruccion = parseInt(document.getElementById('anioConstruccion')?.value || '2000');
+  const numViviendas = parseInt(document.getElementById('numViviendas')?.value || '8');
+  const nivelRampa = document.getElementById('nivelRampa')?.value || 'no';
   const bajantesAntiguas = anioConstruccion < 1995;
   const distribucion = document.querySelector('input[name="distribucion"]:checked')?.value || 'no';
-  AppState.formData = { projectType:tipo, city:ciudad, surface:m2, quality:calidad, details:detalles, companyName:empresa, clientEmail:email, clientPhone:telefono, ivaType, numBanos, distribucion, anioConstruccion, bajantesAntiguas };
+  AppState.formData = { projectType:tipo, city:ciudad, surface:m2, quality:calidad, details:detalles, companyName:empresa, clientEmail:email, clientPhone:telefono, ivaType, numBanos, distribucion, anioConstruccion, bajantesAntiguas, numViviendas, nivelRampa };
 
   // Show loading state
   setStep(2);
@@ -151,13 +153,13 @@ window.goToStep2 = async () => {
       reforma_parcial:  ['demolicion_general','gestion_residuos','albanileria_general','electrica_completa','pavimento_parquet','pintura_total','puerta_paso','limpieza_obra'],
       // Obra nueva: sin fontaneria_completa ni electrica_cuadro por misma razón
       obra_nueva:       ['demolicion_general','gestion_residuos','albanileria_general','ayudas_albanileria','albanileria_tabique','aislamiento_trasdosado','aislamiento_acustico','suelo_flotante_acustico','falso_techo_pladur','foseado_led','electrica_completa','fontaneria_bano','fontaneria_cocina','pavimento_parquet','alicatado_pared','pintura_total','ventana_aluminio','puerta_paso','puerta_blindada','split_ac','clima_conductos','caldera_condensacion','aerotermia','suelo_radiante_agua','bano_ducha_italiano','bano_sanitarios','bano_mampara','bano_griferia','cocina_muebles','cocina_encimera_silestone','limpieza_obra','proyecto_arquitecto'],
-      reforma_bano:     ['demolicion_general','gestion_residuos','albanileria_enfoscado','electrica_enchufe','fontaneria_bano','alicatado_pared','bano_ducha_italiano','bano_sanitarios','bano_mampara','bano_griferia','limpieza_obra'],
-      reforma_cocina:   ['demolicion_general','gestion_residuos','albanileria_enfoscado','electrica_enchufe','electrica_punto_luz','fontaneria_cocina','alicatado_pared','cocina_muebles','cocina_encimera_silestone','limpieza_obra'],
+      reforma_bano:     ['demolicion_general','gestion_residuos','albanileria_enfoscado','electrica_enchufe','fontaneria_bano','alicatado_pared','bano_ducha_italiano','bano_sanitarios','bano_mampara','bano_griferia','bajantes_viejas','limpieza_obra'],
+      reforma_cocina:   ['demolicion_general','gestion_residuos','albanileria_enfoscado','electrica_enchufe','electrica_punto_luz','fontaneria_cocina','alicatado_pared','cocina_muebles','cocina_encimera_silestone','bajantes_viejas','limpieza_obra'],
       // Local comercial: mantiene cuadro separado (es un concepto distinto en locales)
       local_comercial:  ['demolicion_general','gestion_residuos','albanileria_general','falso_techo_pladur','electrica_completa','electrica_cuadro','fontaneria_completa','pavimento_gres','pintura_total','ventana_aluminio','puerta_blindada','split_ac','limpieza_obra','proyecto_arquitecto'],
       oficinas:         ['demolicion_general','gestion_residuos','albanileria_tabique','falso_techo_pladur','electrica_completa','electrica_cuadro','pavimento_gres','pintura_total','split_ac','limpieza_obra','proyecto_arquitecto'],
       fachada:          ['aislamiento_sate','pintura_esmalte','ventana_aluminio','gestion_residuos','limpieza_obra','proyecto_arquitecto'],
-      comunidad_vecinos: ['demolicion_general','gestion_residuos','albanileria_general','electrica_completa','pavimento_gres','alicatado_pared','pintura_total','puerta_blindada','limpieza_obra','proyecto_arquitecto'],
+      comunidad_vecinos: ['demolicion_general','gestion_residuos','albanileria_general','rampa_accesibilidad_cte','electrica_completa','pavimento_gres','alicatado_pared','pintura_total','puerta_blindada','instalacion_videoportero','limpieza_obra','proyecto_arquitecto'],
       cubierta:         ['aislamiento_sate','gestion_residuos','limpieza_obra','proyecto_arquitecto'],
     };
 
@@ -205,6 +207,8 @@ window.goToStep2 = async () => {
       aislamiento_sate: m2n,
       limpieza_obra: m2n,
       bajantes_viejas: 2, // estimado: 1 bajante baño + 1 bajante cocina
+      rampa_accesibilidad_cte: 1, // partida alzada (1 ud independiente del m²)
+      instalacion_videoportero: 1, // placa fija + monitores por num_viviendas (campo adicional)
       // Climatización por calidad: split=estandar, conductos+caldera=media_alta, aerotermia=premium
       // Cantidad 1 para todos — el precio unitario refleja la calidad (0€ si no aplica a esa calidad)
       clima_conductos: Math.max(1, Math.round(m2n / 70)),
@@ -283,6 +287,14 @@ window.goToStep2 = async () => {
         // Suelo flotante acustico: premium automatico, media-alta opcional (precio activo siempre que la partida exista)
         if (p.id === 'suelo_flotante_acustico' && calidadState === 'estándar') precioUnitario = 0;
         if (p.id === 'aislamiento_cubierta') precioUnitario = 0; // solo si usuario marca ático
+        if (p.id === 'instalacion_videoportero') {
+          const nv = AppState.formData.numViviendas || 8;
+          precioUnitario = 850 + (190 * nv); // 850 EUR placa fija + 190 EUR/vivienda
+        }
+        if (p.id === 'rampa_accesibilidad_cte') {
+          const nr = AppState.formData.nivelRampa || 'no';
+          precioUnitario = nr === 'no' ? 0 : nr === 'bajo' ? 1600 : nr === 'alto' ? 2800 : 2200;
+        }
         return { id: p.id, nombre: PRECIOS_DB[p.id].nombre, unidad: PRECIOS_DB[p.id].unidad, precio: precioUnitario, cantidad: p.cantidad, cat };
       });
 
@@ -611,6 +623,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const comInfo = document.getElementById('comunidadInfo');
     if(obraWarn) obraWarn.style.display = tipo === 'obra_nueva' ? 'block' : 'none';
     if(comInfo) comInfo.style.display = tipo === 'comunidad_vecinos' ? 'block' : 'none';
+    const comCampos = document.getElementById('comunidadCampos');
+    if(comCampos) comCampos.style.display = tipo === 'comunidad_vecinos' ? 'block' : 'none';
     // IVA auto para comunidad
     const ivaSelect = document.getElementById('ivaType');
     if(ivaSelect && tipo === 'comunidad_vecinos') ivaSelect.value = '10';
