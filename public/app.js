@@ -408,8 +408,9 @@ function getProjectTypeLabel(type) {
 function showToast(msg) {
   const toast = document.getElementById('toast');
   document.getElementById('toastMsg').textContent = msg;
+  toast.style.display = 'flex';
   toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 3200);
+  setTimeout(() => { toast.classList.remove('show'); setTimeout(() => { toast.style.display = 'none'; }, 300); }, 3200);
 }
 
 // ═══════════════════════════════════════════════════════════════
