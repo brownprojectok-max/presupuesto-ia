@@ -141,7 +141,7 @@ window.goToStep2 = async () => {
     // Partidas fijas por tipo — elimina variabilidad de la IA
     const PARTIDAS_FIJAS = {
       // Reforma integral: sin fontaneria_completa (duplica puntos agua) ni electrica_cuadro (incluido en completa)
-      reforma_integral: ['demolicion_general','gestion_residuos','albanileria_general','albanileria_tabique','aislamiento_trasdosado','falso_techo_pladur','electrica_completa','fontaneria_bano','fontaneria_cocina','pavimento_parquet','alicatado_pared','pintura_total','ventana_aluminio','puerta_paso','split_ac','clima_conductos','caldera_condensacion','bano_ducha_italiano','bano_sanitarios','bano_mampara','bano_griferia','cocina_muebles','cocina_encimera_silestone','limpieza_obra','proyecto_arquitecto'],
+      reforma_integral: ['demolicion_general','gestion_residuos','albanileria_general','albanileria_tabique','aislamiento_trasdosado','aislamiento_acustico','falso_techo_pladur','foseado_led','electrica_completa','fontaneria_bano','fontaneria_cocina','pavimento_parquet','alicatado_pared','pintura_total','ventana_aluminio','puerta_paso','split_ac','clima_conductos','caldera_condensacion','aerotermia','suelo_radiante_agua','bano_ducha_italiano','bano_sanitarios','bano_mampara','bano_griferia','cocina_muebles','cocina_encimera_silestone','limpieza_obra','proyecto_arquitecto'],
       reforma_parcial:  ['demolicion_general','gestion_residuos','albanileria_general','electrica_completa','pavimento_parquet','pintura_total','puerta_paso','limpieza_obra'],
       // Obra nueva: sin fontaneria_completa ni electrica_cuadro por misma razón
       obra_nueva:       ['demolicion_general','gestion_residuos','albanileria_general','albanileria_tabique','falso_techo_pladur','electrica_completa','fontaneria_bano','fontaneria_cocina','pavimento_parquet','alicatado_pared','pintura_total','ventana_aluminio','puerta_paso','puerta_blindada','split_ac','bano_ducha_italiano','bano_sanitarios','bano_mampara','bano_griferia','cocina_muebles','cocina_encimera_silestone','limpieza_obra','proyecto_arquitecto'],
@@ -184,7 +184,7 @@ window.goToStep2 = async () => {
       alicatado_pared: alicatadoTotal,
       pintura_total: m2Pared,
       ventana_aluminio: Math.max(4, Math.round(m2n * 0.12)),
-      puerta_paso: Math.max(3, Math.round(m2n / 15)),
+      puerta_paso: Math.min(7, Math.max(3, Math.round(m2n / 15))), // cap 7 segun aparejador
       puerta_blindada: 1,
       armario_empotrado: Math.round(m2n * 0.05),
       bano_ducha_italiano: numBanos,
@@ -201,8 +201,12 @@ window.goToStep2 = async () => {
       // Cantidad 1 para todos — el precio unitario refleja la calidad (0€ si no aplica a esa calidad)
       clima_conductos: Math.max(1, Math.round(m2n / 70)),
       caldera_condensacion: 1,
-      aerotermia: 1,
+      aerotermia: 1, // bomba de calor (unidad fija)
+      suelo_radiante_agua: m2n, // tubo PE-X + colectores + aditivos por m²
       aislamiento_cubierta: m2n,
+      aislamiento_acustico: Math.round(m2n * 0.3), // medianeras principales (30% superficie)
+      foseado_led: Math.round(Math.sqrt(m2n) * 3), // ml estimados salón+dormitorio principal
+      suelo_radiante_agua: m2n, // m² totales para instalación completa
       proyecto_arquitecto: 1,
     };
 
@@ -255,6 +259,9 @@ window.goToStep2 = async () => {
         if (p.id === 'clima_conductos' && calidadState === 'estándar') precioUnitario = 0;
         if (p.id === 'caldera_condensacion' && calidadState === 'estándar') precioUnitario = 0;
         if (p.id === 'aerotermia' && calidadState !== 'premium') precioUnitario = 0;
+        if (p.id === 'suelo_radiante_agua' && calidadState !== 'premium') precioUnitario = 0;
+        if (p.id === 'aislamiento_acustico' && calidadState === 'estándar') precioUnitario = 0;
+        if (p.id === 'foseado_led' && calidadState === 'estándar') precioUnitario = 0;
         if (p.id === 'aislamiento_cubierta') precioUnitario = 0; // solo si usuario marca ático
         return { id: p.id, nombre: PRECIOS_DB[p.id].nombre, unidad: PRECIOS_DB[p.id].unidad, precio: precioUnitario, cantidad: p.cantidad, cat };
       });
