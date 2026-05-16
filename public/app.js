@@ -119,7 +119,8 @@ window.goToStep2 = async () => {
     return;
   }
 
-  AppState.formData = { projectType:tipo, city:ciudad, surface:m2, quality:calidad, details:detalles, companyName:empresa, clientEmail:email, clientPhone:telefono };
+  const ivaType = parseInt(document.getElementById('ivaType')?.value || '21');
+  AppState.formData = { projectType:tipo, city:ciudad, surface:m2, quality:calidad, details:detalles, companyName:empresa, clientEmail:email, clientPhone:telefono, ivaType };
 
   // Show loading state
   setStep(2);
@@ -136,7 +137,13 @@ window.goToStep2 = async () => {
 
   try {
     const ids = Object.keys(PRECIOS_DB).join(', ');
-    const prompt = `Proyecto: ${getProjectTypeLabel(tipo)}, ${m2}m², ${ciudad}, calidad ${calidad}.${detalles ? ' Requisitos: ' + detalles + '.' : ''} IDs disponibles: ${ids}. Elige 10-14 IDs relevantes y estima cantidades para ${m2}m². Devuelve SOLO array JSON: [{"id":"demolicion_general","cantidad":75}]`;
+    const isIntegral = tipo.includes('integral') || tipo.includes('nueva');
+    const extraIds = isIntegral ? ' Incluye SIEMPRE: cocina_muebles, cocina_encimera_silestone, alicatado_pared, falso_techo_pladur.' : '';
+    const prompt = `Eres experto en presupuestos construcción España. Proyecto: ${getProjectTypeLabel(tipo)}, ${m2}m², ${ciudad}, calidad ${calidad}.${detalles ? ' Requisitos: '+detalles+'.' : ''}${extraIds}
+IDs disponibles: ${ids}.
+Elige 12-16 IDs y estima cantidades realistas para ${m2}m².
+REGLAS: pintura_total en m² de PARED (superficie_suelo x 2.8). parquet solo en zonas sin baño/cocina (resta 12m²). fontaneria_bano y fontaneria_cocina en puntos de agua (3 puntos cada uno).
+Devuelve SOLO array JSON: [{"id":"demolicion_general","cantidad":75}]`;
 
     const r = await fetch('/api/ai', {
       method: 'POST',
@@ -252,7 +259,10 @@ function calcSubtotal() {
 
 function updateSummaryBar() {
   const sub = calcSubtotal();
-  const iva = sub * 0.21;
+  const ivaPct = (AppState.formData.ivaType || 21) / 100;
+  const iva = sub * ivaPct;
+  const lbl = document.getElementById("sb-iva-label");
+  if(lbl) lbl.textContent = "IVA (" + (AppState.formData.ivaType||21) + "%)";
   document.getElementById('sb-subtotal').textContent = formatCurrency(sub);
   document.getElementById('sb-iva').textContent = formatCurrency(iva);
   document.getElementById('sb-total').textContent = formatCurrency(sub + iva);
@@ -264,7 +274,8 @@ function updateSummaryBar() {
 window.goToStep3 = async () => {
   const lineas = AppState.lineItems.filter(p => p.cantidad > 0);
   const sub = lineas.reduce((s,p) => s + p.cantidad*p.precio, 0);
-  const iva = sub * 0.21;
+  const ivaPct = (AppState.formData.ivaType || 21) / 100;
+  const iva = sub * ivaPct;
   const total = sub + iva;
 
   AppState.budgetRef = 'PRE-' + new Date().getFullYear() + '-' + String(Math.floor(Math.random()*9000+1000));
@@ -279,7 +290,11 @@ window.goToStep3 = async () => {
   document.getElementById('budgetTotalPreview').textContent = formatCurrency(total);
   document.getElementById('finalSurface').textContent = AppState.formData.surface + ' m²';
   document.getElementById('final-subtotal').textContent = formatCurrency(sub);
+  const ivaPctLabel = AppState.formData.ivaType || 21;
   document.getElementById('final-iva').textContent = formatCurrency(iva);
+  // Update IVA label if element exists
+  const ivaLabel = document.getElementById('final-iva-label');
+  if(ivaLabel) ivaLabel.textContent = 'IVA (' + ivaPctLabel + '%)';
   document.getElementById('final-total').textContent = formatCurrency(total);
 
   // Render final items table

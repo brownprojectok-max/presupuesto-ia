@@ -173,6 +173,13 @@
                 <label class="field-label" for="clientPhone">Teléfono</label>
                 <input id="clientPhone" type="tel" class="field-input" placeholder="+34 600 000 000" />
               </div>
+              <div class="field">
+                <label class="field-label" for="ivaType">Tipo de IVA <span style="color:#e53e3e">*</span></label>
+                <select id="ivaType" class="field-input">
+                  <option value="21">21% — Empresa / Sociedad</option>
+                  <option value="10">10% — Particular / Vivienda habitual</option>
+                </select>
+              </div>
             </div>
 
             <!-- Info box -->
@@ -219,7 +226,7 @@
           </div>
           <div class="summary-divider"></div>
           <div class="summary-item">
-            <span class="summary-label">IVA (21%)</span>
+            <span class="summary-label" id="sb-iva-label">IVA (21%)</span>
             <span class="summary-value" id="sb-iva">0,00 €</span>
           </div>
           <div class="summary-divider"></div>
@@ -302,7 +309,7 @@
             <span class="totals-value" id="final-subtotal">0,00 €</span>
           </div>
           <div class="totals-row">
-            <span class="totals-label">IVA (21%)</span>
+            <span class="totals-label" id="final-iva-label">IVA (21%)</span>
             <span class="totals-value" id="final-iva">0,00 €</span>
           </div>
           <div class="totals-divider-line"></div>
