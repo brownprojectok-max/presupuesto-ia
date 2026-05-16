@@ -188,15 +188,21 @@
                 <span class="estimate-range" id="estimateRange">—</span>
               </div>
             </div>
+
+            <!-- CTA inside card (desktop only) -->
+            <div class="step-actions step-actions-card">
+              <button class="btn-primary btn-cta" id="goToStep2Btn" onclick="goToStep2()">
+                Ver partidas
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Step 1 CTA -->
-      <div class="step-actions">
-        <button class="btn-primary btn-cta" id="goToStep2Btn" onclick="goToStep2()">
+      <!-- Step 1 CTA (mobile only) -->
+      <div class="step-actions step-actions-mobile">
+        <button class="btn-primary btn-cta" onclick="goToStep2()">
           Ver partidas
-          <span class="btn-arrow">→</span>
         </button>
       </div>
     </section>

@@ -1145,3 +1145,12 @@ body {
 /* ── FIX: button not clipped at bottom ── */
 .step-section { padding-bottom: 32px; }
 .step-actions { margin-top: 2rem; margin-bottom: 1rem; }
+
+/* ── BUTTON POSITION: inside card on desktop, outside on mobile ── */
+.step-actions-card { display: flex; justify-content: flex-end; margin-top: 1.5rem; }
+.step-actions-mobile { display: none; }
+
+@media (max-width: 900px) {
+  .step-actions-card { display: none; }
+  .step-actions-mobile { display: flex; justify-content: flex-end; margin-top: 1.5rem; }
+}
