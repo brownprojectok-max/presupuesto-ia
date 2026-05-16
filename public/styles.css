@@ -1141,3 +1141,7 @@ body {
   .budget-header-right { width: 100%; }
   .budget-total-preview { margin-top: 12px; padding-top: 12px; }
 }
+
+/* ── FIX: button not clipped at bottom ── */
+.step-section { padding-bottom: 32px; }
+.step-actions { margin-top: 2rem; margin-bottom: 1rem; }
