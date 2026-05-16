@@ -1,485 +1,382 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PresupuestoIA — Calculadora Inteligente</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PresupuestoIA – Software de Presupuestos para Construcción</title>
+  <meta name="description" content="Genera presupuestos profesionales de construcción en minutos con PresupuestoIA. Diseñado para empresas constructoras españolas." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;background:#f4f6f9;color:#1a2744;min-height:100vh;font-size:15px}
-
-/* HEADER */
-.top-header{background:#1a2744;padding:18px 20px;display:flex;align-items:center;gap:14px}
-.top-icon{width:44px;height:44px;background:#2d4a8a;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0}
-.top-header h1{color:white;font-size:1.1rem;font-weight:700;line-height:1.3}
-.top-header p{color:#7a96c9;font-size:0.82rem;margin-top:2px}
-
-/* STEPS */
-.steps{background:white;padding:16px 20px;border-bottom:1px solid #e2e8f0;overflow-x:auto}
-.steps-inner{display:flex;align-items:flex-start;gap:0;min-width:280px}
-.step-item{display:flex;flex-direction:column;align-items:center;flex:1;position:relative;cursor:pointer}
-.step-item:not(:last-child)::after{content:'';position:absolute;top:16px;left:50%;width:100%;height:2px;background:#e2e8f0;z-index:0}
-.step-item:not(:last-child).done::after{background:#2d4a8a}
-.step-num{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.82rem;font-weight:700;border:2px solid #e2e8f0;color:#999;background:white;position:relative;z-index:1;transition:all 0.3s}
-.step-num.active{background:#f59e0b;border-color:#f59e0b;color:white}
-.step-num.done{background:#2d4a8a;border-color:#2d4a8a;color:white}
-.step-lbl{font-size:0.72rem;color:#999;margin-top:6px;text-align:center;font-weight:500;line-height:1.3}
-.step-lbl.active{color:#1a2744;font-weight:700}
-
-/* MAIN */
-.main{max-width:640px;margin:0 auto;padding:20px 16px 80px}
-
-/* SECTION TITLE */
-.section-title{font-size:0.78rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#1a2744;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid #1a2744}
-
-/* CARD */
-.card{background:white;border-radius:10px;padding:20px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.06)}
-
-/* FORM */
-.fg{margin-bottom:16px}
-.fg:last-child{margin-bottom:0}
-label{display:block;font-size:0.82rem;font-weight:600;color:#374151;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.04em}
-input,select,textarea{width:100%;padding:12px 14px;border:1.5px solid #e2e8f0;border-radius:8px;font-family:inherit;font-size:0.95rem;color:#1a2744;background:white;outline:none;transition:border-color 0.2s;appearance:none;-webkit-appearance:none}
-input:focus,select:focus,textarea:focus{border-color:#2d4a8a}
-select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
-textarea{resize:vertical;min-height:80px}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-
-/* TOTBAR */
-.totbar{background:#1a2744;border-radius:10px;padding:18px 20px;margin-bottom:16px}
-.totbar-row{display:flex;justify-content:space-between;align-items:center;color:#7a96c9;font-size:0.88rem;margin-bottom:8px}
-.totbar-row:last-child{margin-bottom:0}
-.totbar-total{display:flex;justify-content:space-between;align-items:center;border-top:1px solid #2d4a8a;margin-top:12px;padding-top:12px}
-.totbar-total span:first-child{color:white;font-weight:700;font-size:0.95rem;text-transform:uppercase;letter-spacing:0.05em}
-.totbar-total span:last-child{color:#f59e0b;font-size:1.6rem;font-weight:800;letter-spacing:-0.02em}
-
-/* PARTIDAS TABLE */
-.pt{width:100%;border-collapse:collapse}
-.pt-head{display:grid;grid-template-columns:1fr 80px 90px;gap:0;padding:8px 12px;background:#f4f6f9;border-radius:6px;margin-bottom:4px}
-.pt-head span{font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#999}
-.pt-head span:nth-child(2),.pt-head span:nth-child(3){text-align:right}
-.pt-row{display:grid;grid-template-columns:1fr 80px 90px;gap:0;padding:12px;border-bottom:1px solid #f0f2f5;align-items:center}
-.pt-row:last-child{border-bottom:none}
-.pt-row.cat-row{grid-template-columns:1fr;background:#eef1f8;padding:8px 12px;border-radius:4px;margin:8px 0 4px}
-.pt-row.cat-row span{font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#2d4a8a}
-.pt-name{font-size:0.88rem;color:#1a2744;font-weight:500;line-height:1.3}
-.pt-ud{font-size:0.78rem;color:#999;margin-top:2px}
-.pt-qty input{width:72px;padding:7px 8px;text-align:right;font-size:0.88rem;border:1.5px solid #e2e8f0;border-radius:6px;font-family:inherit}
-.pt-qty input:focus{border-color:#2d4a8a}
-.pt-total{text-align:right;font-weight:700;font-size:0.9rem;color:#1a2744}
-
-/* BUTTONS */
-.btn-primary{width:100%;padding:15px;background:#2d4a8a;color:white;border:none;border-radius:8px;font-family:inherit;font-size:0.95rem;font-weight:700;cursor:pointer;transition:all 0.2s;letter-spacing:0.02em}
-.btn-primary:hover{background:#1e3a6e}
-.btn-primary:disabled{background:#ccc;cursor:not-allowed}
-.btn-secondary{width:100%;padding:14px;background:white;color:#1a2744;border:2px solid #e2e8f0;border-radius:8px;font-family:inherit;font-size:0.92rem;font-weight:600;cursor:pointer;transition:all 0.2s}
-.btn-secondary:hover{border-color:#2d4a8a;color:#2d4a8a}
-.btn-gold{background:#f59e0b;color:white;border:none}
-.btn-gold:hover{background:#d97706}
-.btn-row{display:flex;gap:10px;margin-top:16px}
-.btn-row .btn-primary,.btn-row .btn-secondary{flex:1}
-
-/* LOADER */
-.loader{text-align:center;padding:48px 20px}
-.ring{width:48px;height:48px;border:3px solid #e2e8f0;border-top-color:#2d4a8a;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 18px}
-@keyframes spin{to{transform:rotate(360deg)}}
-.ltxt{font-size:0.95rem;color:#666;font-weight:500}
-.lstep{margin-top:8px;font-size:0.82rem;color:#2d4a8a;font-weight:600;min-height:20px}
-
-/* RESULT */
-.result-header{background:#1a2744;border-radius:10px;padding:20px;margin-bottom:16px;color:white}
-.result-num{font-size:0.78rem;color:#7a96c9;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.06em}
-.result-title{font-size:1.1rem;font-weight:800;margin-bottom:4px}
-.result-sub{font-size:0.85rem;color:#a8c0e8;line-height:1.5}
-.result-badge{display:inline-block;background:#059669;color:white;font-size:0.72rem;font-weight:700;padding:4px 10px;border-radius:4px;margin-top:10px;letter-spacing:0.04em}
-.result-table{width:100%;border-collapse:collapse}
-.result-table th{font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#999;text-align:left;padding:8px 0 10px;border-bottom:2px solid #e2e8f0}
-.result-table th:nth-child(2){text-align:right}
-.result-table th:last-child{text-align:right}
-.result-table td{padding:11px 0;border-bottom:1px solid #f0f2f5;font-size:0.88rem;vertical-align:top}
-.result-table tr:last-child td{border-bottom:none}
-.result-table .cat-td{background:#eef1f8;font-size:0.7rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#2d4a8a;padding:7px 8px;border-bottom:none}
-.result-table .amt{text-align:right;font-weight:700;white-space:nowrap}
-.result-table .qty{text-align:right;color:#666;font-size:0.82rem;white-space:nowrap}
-.result-totals{margin-top:16px;border-top:2px solid #e2e8f0;padding-top:14px}
-.result-row{display:flex;justify-content:space-between;font-size:0.88rem;color:#555;margin-bottom:8px}
-.result-total-row{display:flex;justify-content:space-between;align-items:center;background:#1a2744;color:white;border-radius:8px;padding:16px 18px;margin-top:8px}
-.result-total-row span:first-child{font-size:0.82rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em}
-.result-total-row span:last-child{font-size:1.5rem;font-weight:800;color:#f59e0b;letter-spacing:-0.02em}
-.meta-info{display:flex;gap:20px;font-size:0.82rem;color:#666;margin-top:14px;flex-wrap:wrap}
-.meta-info span strong{color:#1a2744}
-.ai-box{background:#eef1f8;border-left:4px solid #2d4a8a;border-radius:0 8px 8px 0;padding:14px 16px;margin-top:16px;font-size:0.85rem;line-height:1.65;color:#374151}
-.ai-box strong{color:#2d4a8a;display:block;margin-bottom:4px;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em}
-.disclaimer{font-size:0.78rem;color:#999;text-align:center;margin-top:12px;font-style:italic}
-
-/* ACTION BUTTONS */
-.action-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
-.action-btn{padding:13px;border-radius:8px;font-family:inherit;font-size:0.85rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;letter-spacing:0.02em;transition:all 0.2s;border:2px solid #e2e8f0;background:white;color:#1a2744}
-.action-btn:hover{border-color:#2d4a8a;color:#2d4a8a}
-.action-btn.gold{background:#f59e0b;color:white;border-color:#f59e0b}
-.action-btn.gold:hover{background:#d97706;border-color:#d97706}
-
-footer{text-align:center;padding:24px 20px;font-size:0.78rem;color:#999;border-top:1px solid #e2e8f0;background:white;margin-top:20px}
-</style>
-</head>
+.line-items-group{margin-bottom:20px}
+.group-header{display:flex;align-items:center;gap:8px;padding:10px 16px;background:#eef1f8;border-radius:8px;margin-bottom:4px}
+.group-icon{font-size:1rem}
+.group-label{font-size:0.78rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#2d4a8a}
+.line-items-table{background:white;border-radius:8px;overflow:hidden;border:1px solid #e8ecf3}
+.lt-head{display:grid;grid-template-columns:1fr 60px 90px 80px 90px;gap:0;padding:8px 14px;background:#f8f9fc;border-bottom:1px solid #e8ecf3}
+.lt-head span{font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#999}
+.lt-head span:nth-child(3),.lt-head span:nth-child(4),.lt-head span:nth-child(5){text-align:right}
+.lt-row{display:grid;grid-template-columns:1fr 60px 90px 80px 90px;gap:0;padding:12px 14px;border-bottom:1px solid #f0f2f5;align-items:center}
+.lt-row:last-child{border-bottom:none}
+.lt-concept{font-size:0.88rem;font-weight:500;color:#1a2744}
+.lt-unit{font-size:0.82rem;color:#999}
+.lt-qty input{width:70px;padding:6px 8px;text-align:right;border:1.5px solid #e2e8f0;border-radius:6px;font-family:inherit;font-size:0.88rem}
+.lt-qty input:focus{border-color:#2d4a8a;outline:none}
+.lt-price{text-align:right;font-size:0.82rem;color:#666}
+.lt-total{text-align:right;font-weight:700;font-size:0.9rem;color:#1a2744}
+.final-table{width:100%;border-collapse:collapse}
+.final-table th{font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#999;padding:8px 12px 10px;border-bottom:2px solid #e8ecf3;text-align:left}
+.final-table th:nth-child(2),.final-table th:nth-child(3),.final-table th:nth-child(4){text-align:right}
+.final-table td{padding:10px 12px;border-bottom:1px solid #f0f2f5;font-size:0.88rem;vertical-align:top}
+.final-table tr:last-child td{border-bottom:none}
+.final-cat-row td{background:#eef1f8;font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#2d4a8a;padding:7px 12px;border-bottom:none!important}
+@media(max-width:680px){
+  .lt-head,.lt-row{grid-template-columns:1fr 70px 80px}
+  .lt-head span:nth-child(2),.lt-row .lt-unit,
+  .lt-head span:nth-child(4),.lt-row .lt-price{display:none}
+  .lt-qty input{width:60px}
+}
+</style></head>
 <body>
 
-<!-- HEADER -->
-<div class="top-header">
-  <div class="top-icon">🏗️</div>
-  <div>
-    <h1>PresupuestoIA</h1>
-    <p>Obtén un presupuesto detallado de tu proyecto</p>
-  </div>
-</div>
-
-<!-- STEPS -->
-<div class="steps">
-  <div class="steps-inner">
-    <div class="step-item done" id="si1"><div class="step-num done" id="sn1">1</div><div class="step-lbl active" id="sl1">Datos del<br>proyecto</div></div>
-    <div class="step-item" id="si2"><div class="step-num" id="sn2">2</div><div class="step-lbl" id="sl2">Áreas y<br>cantidades</div></div>
-    <div class="step-item" id="si3"><div class="step-num" id="sn3">3</div><div class="step-lbl" id="sl3">Presupuesto<br>final</div></div>
-  </div>
-</div>
-
-<div class="main">
-
-  <!-- STEP 1 -->
-  <div id="s1">
-    <div class="section-title">1. Datos del proyecto</div>
-    <div class="card">
-      <div class="g2">
-        <div class="fg">
-          <label>Tipo de proyecto</label>
-          <select id="tipo">
-            <option value="">Selecciona...</option>
-            <option value="reforma integral de vivienda">Reforma integral vivienda</option>
-            <option value="reforma de baño">Reforma de baño</option>
-            <option value="reforma de cocina">Reforma de cocina</option>
-            <option value="construcción de local comercial">Local comercial</option>
-            <option value="instalación eléctrica completa">Instalación eléctrica</option>
-            <option value="pintura y acabados interiores">Pintura y acabados</option>
-            <option value="obra nueva residencial">Obra nueva residencial</option>
-          </select>
-        </div>
-        <div class="fg">
-          <label>Ciudad / Provincia</label>
-          <input type="text" id="ciudad" placeholder="Madrid...">
-        </div>
-        <div class="fg">
-          <label>Superficie (m²)</label>
-          <input type="number" id="m2" placeholder="120" min="1">
-        </div>
-        <div class="fg">
-          <label>Calidad</label>
-          <select id="calidad">
-            <option value="estándar">Estándar</option>
-            <option value="media-alta" selected>Media-alta</option>
-            <option value="premium">Premium</option>
-          </select>
-        </div>
+  <!-- ═══════════════════════ NAVBAR ═══════════════════════ -->
+  <header class="navbar">
+    <div class="navbar-inner">
+      <div class="logo">
+        <span class="logo-icon">⚡</span>
+        <span class="logo-text">Presupuesto<span class="logo-accent">IA</span></span>
       </div>
-      <div class="fg">
-        <label>Detalles adicionales (opcional)</label>
-        <textarea id="detalles" placeholder="Ej: 2 baños, cocina abierta, parquet..."></textarea>
+      <nav class="nav-links">
+        <span class="nav-link">Mis Presupuestos</span>
+        <span class="nav-link">Clientes</span>
+        <button class="btn-nav" id="newBudgetBtn">+ Nuevo presupuesto</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════ STEPPER ═══════════════════════ -->
+  <div class="stepper-bar" id="stepperBar">
+    <div class="stepper-inner">
+      <div class="step active" id="step-indicator-1">
+        <div class="step-circle">1</div>
+        <div class="step-label">Datos del proyecto</div>
+      </div>
+      <div class="step-line"></div>
+      <div class="step" id="step-indicator-2">
+        <div class="step-circle">2</div>
+        <div class="step-label">Confirmar partidas</div>
+      </div>
+      <div class="step-line"></div>
+      <div class="step" id="step-indicator-3">
+        <div class="step-circle">3</div>
+        <div class="step-label">Presupuesto final</div>
       </div>
     </div>
+  </div>
 
-    <div class="section-title" style="margin-top:20px">2. Datos del cliente</div>
-    <div class="card">
-      <div class="g2">
-        <div class="fg"><label>Empresa / Nombre</label><input type="text" id="cliente" placeholder="Constructora López S.L."></div>
-        <div class="fg"><label>Email</label><input type="email" id="email" placeholder="contacto@empresa.com"></div>
-        <div class="fg"><label>Teléfono</label><input type="tel" id="telefono" placeholder="+34 600 000 000"></div>
+  <!-- ═══════════════════════ MAIN CONTENT ═══════════════════════ -->
+  <main class="main-container">
+
+    <!-- ──────────── STEP 1: PROJECT DATA FORM ──────────── -->
+    <section id="step1" class="step-section active">
+      <div class="section-header">
+        <h1 class="section-title">Nuevo presupuesto</h1>
+        <p class="section-subtitle">Completa los datos del proyecto para generar las partidas automáticamente</p>
       </div>
-    </div>
 
-    <button class="btn-primary" onclick="generarPartidas()">Ver partidas →</button>
-  </div>
+      <div class="form-grid">
+        <!-- Project Info Card -->
+        <div class="card form-card">
+          <div class="card-header">
+            <span class="card-icon">🏗️</span>
+            <h2 class="card-title">Información del proyecto</h2>
+          </div>
+          <div class="card-body">
+            <div class="field-group field-group-2">
+              <div class="field">
+                <label class="field-label" for="projectType">Tipo de obra <span class="required">*</span></label>
+                <div class="select-wrapper">
+                  <select id="projectType" class="field-input select-input">
+                    <option value="">Seleccionar tipo…</option>
+                    <option value="reforma_integral">Reforma integral de vivienda</option>
+                    <option value="reforma_parcial">Reforma parcial</option>
+                    <option value="obra_nueva">Obra nueva</option>
+                    <option value="reforma_bano">Reforma de baño</option>
+                    <option value="reforma_cocina">Reforma de cocina</option>
+                    <option value="local_comercial">Local comercial</option>
+                    <option value="oficinas">Oficinas</option>
+                    <option value="fachada">Rehabilitación de fachada</option>
+                    <option value="cubierta">Reforma de cubierta</option>
+                  </select>
+                  <span class="select-arrow">›</span>
+                </div>
+              </div>
+              <div class="field">
+                <label class="field-label" for="city">Ciudad / Municipio <span class="required">*</span></label>
+                <input id="city" type="text" class="field-input" placeholder="Ej: Madrid, Barcelona…" />
+              </div>
+            </div>
 
-  <!-- LOADER -->
-  <div id="sload" style="display:none">
-    <div class="loader"><div class="ring"></div><div class="ltxt">Analizando proyecto...</div><div class="lstep" id="lstep"></div></div>
-  </div>
+            <div class="field-group field-group-2">
+              <div class="field">
+                <label class="field-label" for="surface">Superficie (m²) <span class="required">*</span></label>
+                <div class="input-unit-wrapper">
+                  <input id="surface" type="number" class="field-input input-unit" placeholder="0" min="1" max="9999" />
+                  <span class="unit-badge">m²</span>
+                </div>
+              </div>
+              <div class="field">
+                <label class="field-label" for="quality">Calidad de materiales <span class="required">*</span></label>
+                <div class="select-wrapper">
+                  <select id="quality" class="field-input select-input">
+                    <option value="">Seleccionar calidad…</option>
+                    <option value="estandar">Estándar</option>
+                    <option value="media_alta">Media-alta</option>
+                    <option value="premium">Premium</option>
+                  </select>
+                  <span class="select-arrow">›</span>
+                </div>
+              </div>
+            </div>
 
-  <!-- STEP 2 -->
-  <div id="s2" style="display:none">
-    <div class="section-title">2. Áreas y cantidades</div>
-    <p style="font-size:0.88rem;color:#666;margin-bottom:16px;line-height:1.5">La IA propuso estas cantidades. Ajusta lo que necesites — los precios son fijos de nuestra base de datos.</p>
+            <div class="field">
+              <label class="field-label" for="details">Detalles adicionales <span class="optional">(opcional)</span></label>
+              <textarea id="details" class="field-input field-textarea" rows="4" placeholder="Describe aspectos específicos del proyecto, condicionantes especiales, materiales preferidos, etc."></textarea>
+            </div>
 
-    <div class="totbar">
-      <div class="totbar-row"><span>Subtotal sin IVA</span><span id="lsub">0,00 €</span></div>
-      <div class="totbar-row"><span>IVA (21%)</span><span id="liva">0,00 €</span></div>
-      <div class="totbar-total"><span>TOTAL ESTIMADO</span><span id="ltot">0,00 €</span></div>
-    </div>
+            <!-- Quality indicators -->
+            <div class="quality-preview" id="qualityPreview" style="display:none">
+              <div class="quality-badge" id="qualityBadge"></div>
+            </div>
+          </div>
+        </div>
 
-    <div class="card" style="padding:0;overflow:hidden">
-      <div style="padding:12px 12px 0">
-        <div class="pt-head"><span>Concepto</span><span>Cantidad</span><span>Total</span></div>
+        <!-- Client Info Card -->
+        <div class="card form-card">
+          <div class="card-header">
+            <span class="card-icon">🏢</span>
+            <h2 class="card-title">Datos del cliente</h2>
+          </div>
+          <div class="card-body">
+            <div class="field">
+              <label class="field-label" for="companyName">Empresa / Razón social <span class="required">*</span></label>
+              <input id="companyName" type="text" class="field-input" placeholder="Nombre de la empresa o particular" />
+            </div>
+            <div class="field-group field-group-2">
+              <div class="field">
+                <label class="field-label" for="clientEmail">Email <span class="required">*</span></label>
+                <input id="clientEmail" type="email" class="field-input" placeholder="correo@empresa.com" />
+              </div>
+              <div class="field">
+                <label class="field-label" for="clientPhone">Teléfono</label>
+                <input id="clientPhone" type="tel" class="field-input" placeholder="+34 600 000 000" />
+              </div>
+            </div>
+
+            <!-- Info box -->
+            <div class="info-box">
+              <span class="info-icon">💡</span>
+              <p class="info-text">PresupuestoIA generará las partidas de obra automáticamente basándose en el tipo de proyecto, superficie y calidad seleccionados.</p>
+            </div>
+
+            <!-- Estimate preview -->
+            <div class="estimate-preview" id="estimatePreview" style="display:none">
+              <div class="estimate-row">
+                <span class="estimate-label">Estimación orientativa:</span>
+                <span class="estimate-range" id="estimateRange">—</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div id="ptbody"></div>
+
+      <!-- Step 1 CTA -->
+      <div class="step-actions">
+        <button class="btn-primary btn-cta" id="goToStep2Btn" onclick="goToStep2()">
+          Ver partidas
+          <span class="btn-arrow">→</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ──────────── STEP 2: LINE ITEMS ──────────── -->
+    <section id="step2" class="step-section">
+
+      <!-- Live summary bar -->
+      <div class="summary-bar" id="summaryBar">
+        <div class="summary-bar-inner">
+          <div class="summary-item">
+            <span class="summary-label">Subtotal</span>
+            <span class="summary-value" id="sb-subtotal">0,00 €</span>
+          </div>
+          <div class="summary-divider"></div>
+          <div class="summary-item">
+            <span class="summary-label">IVA (21%)</span>
+            <span class="summary-value" id="sb-iva">0,00 €</span>
+          </div>
+          <div class="summary-divider"></div>
+          <div class="summary-item summary-total">
+            <span class="summary-label">Total presupuesto</span>
+            <span class="summary-value summary-value-total" id="sb-total">0,00 €</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-header">
+        <h1 class="section-title">Confirmar partidas de obra</h1>
+        <p class="section-subtitle">Revisa y ajusta las cantidades según las necesidades del proyecto</p>
+      </div>
+
+      <!-- Line items table (dynamically populated) -->
+      <div id="lineItemsContainer"></div>
+
+      <!-- Step 2 actions -->
+      <div class="step-actions step-actions-row">
+        <button class="btn-secondary" onclick="goToStep1()">
+          ← Volver
+        </button>
+        <button class="btn-primary btn-cta" onclick="goToStep3()">
+          Generar presupuesto ⚡
+        </button>
+      </div>
+    </section>
+
+    <!-- ──────────── STEP 3: FINAL BUDGET ──────────── -->
+    <section id="step3" class="step-section">
+
+      <!-- Dark header card -->
+      <div class="budget-header-card" id="budgetHeaderCard">
+        <div class="budget-header-inner">
+          <div class="budget-header-left">
+            <div class="budget-ref" id="budgetRef">REF-2026-0001</div>
+            <h1 class="budget-title" id="budgetTitle">Reforma integral de vivienda</h1>
+            <div class="budget-meta">
+              <span class="budget-meta-item">
+                <span class="meta-icon">🏢</span>
+                <span id="budgetClient">—</span>
+              </span>
+              <span class="budget-meta-item">
+                <span class="meta-icon">📍</span>
+                <span id="budgetCity">—</span>
+              </span>
+              <span class="budget-meta-item">
+                <span class="meta-icon">📐</span>
+                <span id="budgetSurface">— m²</span>
+              </span>
+            </div>
+          </div>
+          <div class="budget-header-right">
+            <div class="budget-date-label">Fecha de emisión</div>
+            <div class="budget-date" id="budgetDate">—</div>
+            <div class="budget-status-badge">Borrador</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Final itemized table -->
+      <div class="card" style="margin-top: 1.5rem;">
+        <div class="card-header">
+          <span class="card-icon">📋</span>
+          <h2 class="card-title">Partidas del presupuesto</h2>
+        </div>
+        <div id="finalItemsContainer"></div>
+      </div>
+
+      <!-- Totals section -->
+      <div class="card totals-card">
+        <div class="totals-grid">
+          <div class="totals-row">
+            <span class="totals-label">Subtotal sin IVA</span>
+            <span class="totals-value" id="final-subtotal">0,00 €</span>
+          </div>
+          <div class="totals-row">
+            <span class="totals-label">IVA (21%)</span>
+            <span class="totals-value" id="final-iva">0,00 €</span>
+          </div>
+          <div class="totals-divider-line"></div>
+          <div class="totals-row totals-row-total">
+            <span class="totals-label-total">TOTAL PRESUPUESTO</span>
+            <span class="totals-value-total" id="final-total">0,00 €</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Plazo + Validez -->
+      <div class="info-cards-row">
+        <div class="card info-mini-card">
+          <div class="info-mini-icon">📅</div>
+          <div class="info-mini-label">Plazo estimado</div>
+          <div class="info-mini-value" id="plazoEstimado">—</div>
+        </div>
+        <div class="card info-mini-card">
+          <div class="info-mini-icon">✅</div>
+          <div class="info-mini-label">Validez del presupuesto</div>
+          <div class="info-mini-value">30 días</div>
+        </div>
+        <div class="card info-mini-card">
+          <div class="info-mini-icon">📐</div>
+          <div class="info-mini-label">Superficie</div>
+          <div class="info-mini-value" id="finalSurface">— m²</div>
+        </div>
+      </div>
+
+      <!-- AI Analysis Box -->
+      <div class="card ai-analysis-card">
+        <div class="ai-analysis-header">
+          <span class="ai-badge">⚡ IA</span>
+          <h3 class="ai-title">Análisis inteligente del presupuesto</h3>
+        </div>
+        <div class="ai-content" id="aiContent">
+          <div class="ai-loading" id="aiLoading">
+            <div class="ai-spinner"></div>
+            <span>Analizando presupuesto con IA…</span>
+          </div>
+          <div class="ai-result" id="aiResult" style="display:none"></div>
+        </div>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="action-buttons-grid">
+        <button class="btn-action btn-action-secondary" onclick="goToStep2()">
+          <span class="btn-action-icon">✏️</span>
+          Editar partidas
+        </button>
+        <button class="btn-action btn-action-primary" onclick="downloadPDF()">
+          <span class="btn-action-icon">⬇️</span>
+          Descargar PDF
+        </button>
+        <button class="btn-action btn-action-secondary" onclick="sendByEmail()">
+          <span class="btn-action-icon">📧</span>
+          Enviar por email
+        </button>
+        <button class="btn-action btn-action-gold" onclick="newBudget()">
+          <span class="btn-action-icon">+</span>
+          Nuevo presupuesto
+        </button>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- ═══════════════════════ FOOTER ═══════════════════════ -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="logo logo-sm">
+        <span class="logo-icon">⚡</span>
+        <span class="logo-text">Presupuesto<span class="logo-accent">IA</span></span>
+      </div>
+      <p class="footer-text">© 2026 PresupuestoIA · Software profesional para empresas constructoras</p>
     </div>
+  </footer>
 
-    <div class="btn-row">
-      <button class="btn-secondary" onclick="back1()">← Volver</button>
-      <button class="btn-primary" onclick="generarFinal()">Generar presupuesto ⚡</button>
-    </div>
+  <!-- Validation toast -->
+  <div class="toast" id="toast">
+    <span class="toast-icon">⚠️</span>
+    <span class="toast-msg" id="toastMsg"></span>
   </div>
 
-  <!-- STEP 3 -->
-  <div id="s3" style="display:none">
-    <div class="section-title">3. Presupuesto final</div>
-    <div id="presresult"></div>
-  </div>
-
-</div>
-
-<footer>PresupuestoIA · Powered by Claude AI · © 2025</footer>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-const app = initializeApp({
-  apiKey:"AIzaSyArUe9NXi6YMDvFCWStzgm0Yhn_wfUbF9o",
-  authDomain:"presupuesto-ia-594b9.firebaseapp.com",
-  projectId:"presupuesto-ia-594b9",
-  storageBucket:"presupuesto-ia-594b9.firebasestorage.app",
-  messagingSenderId:"78219000130",
-  appId:"1:78219000130:web:a169de0c7be56dda8870db"
-});
-const db = getFirestore(app);
-
-const STEPS = ["Analizando tipo de proyecto...","Consultando base de datos de precios...","Estimando cantidades...","Preparando partidas..."];
-let DB = {};
-let partidas = [];
-
-const fmt = n => n.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' €';
-
-const CATS = {
-  'Demolición':['demolicion_general','demolicion_tabique','demolicion_pavimento'],
-  'Albañilería':['albanileria_tabique','albanileria_enfoscado','albanileria_general'],
-  'Electricidad':['electrica_completa','electrica_cuadro','electrica_punto_luz','electrica_enchufe'],
-  'Fontanería':['fontaneria_completa','fontaneria_bano','fontaneria_cocina','fontaneria_radiador'],
-  'Pavimentos':['pavimento_parquet','pavimento_parquet_macizo','pavimento_gres','pavimento_microcemento','pavimento_rodapie','alicatado_pared'],
-  'Pintura':['pintura_total','pintura_esmalte'],
-  'Carpintería ext.':['ventana_aluminio','ventana_pvc','persiana_motorizada'],
-  'Carpintería int.':['puerta_paso','puerta_blindada','armario_empotrado'],
-  'Baño':['bano_completo','bano_ducha_italiano','bano_sanitarios','bano_mampara','bano_griferia'],
-  'Cocina':['cocina_muebles','cocina_encimera_silestone','cocina_encimera_ceramica'],
-  'Otros':['split_ac','suelo_radiante','aislamiento_sate','proyecto_arquitecto','limpieza_obra','gestion_residuos'],
-};
-
-async function loadDB(){
-  const snap = await getDocs(collection(db,'precios_construccion'));
-  snap.forEach(d=>{DB[d.id]=d.data();});
-}
-loadDB();
-
-function precio(id,cal){
-  const p=DB[id]; if(!p) return 0;
-  const k=cal==='premium'?'premium':cal==='estándar'?'estandar':'media_alta';
-  return p[k]||p.media_alta||0;
-}
-
-function setStep(n){
-  [1,2,3].forEach(i=>{
-    document.getElementById('sn'+i).className='step-num'+(i<n?' done':i===n?' active':'');
-    document.getElementById('sl'+i).className='step-lbl'+(i===n?' active':'');
-    document.getElementById('si'+i).className='step-item'+(i<n?' done':'');
-  });
-}
-
-function recalc(){
-  let sub=0;
-  partidas.forEach(p=>{
-    const el=document.getElementById('q-'+p.id);
-    const q=parseFloat(el?.value||0);
-    const t=q*p.precio; sub+=t;
-    const tc=document.getElementById('t-'+p.id);
-    if(tc) tc.textContent=fmt(t);
-    const row=document.getElementById('r-'+p.id);
-    if(row) row.style.opacity=q===0?'0.4':'1';
-  });
-  const iva=sub*0.21;
-  document.getElementById('lsub').textContent=fmt(sub);
-  document.getElementById('liva').textContent=fmt(iva);
-  document.getElementById('ltot').textContent=fmt(sub+iva);
-}
-
-window.back1=()=>{document.getElementById('s2').style.display='none';document.getElementById('s1').style.display='block';setStep(1);};
-window.back2=()=>{document.getElementById('s3').style.display='none';document.getElementById('s2').style.display='block';setStep(2);};
-
-window.generarPartidas=async()=>{
-  const tipo=document.getElementById('tipo').value;
-  const m2=document.getElementById('m2').value;
-  const ciudad=document.getElementById('ciudad').value;
-  const cal=document.getElementById('calidad').value;
-  const det=document.getElementById('detalles').value;
-  if(!tipo||!m2||!ciudad){alert('Rellena tipo de proyecto, superficie y ciudad.');return;}
-
-  document.getElementById('s1').style.display='none';
-  document.getElementById('sload').style.display='block';
-  document.querySelector('footer').style.display='none';
-  setStep(2);
-
-  let si=0; const sel=document.getElementById('lstep');
-  sel.textContent=STEPS[0];
-  const iv=setInterval(()=>{si=(si+1)%STEPS.length;sel.textContent=STEPS[si];},1000);
-
-  const ids=Object.keys(DB).join(', ');
-  const prompt=`Proyecto: ${tipo}, ${m2}m², ${ciudad}, calidad ${cal}.${det?' Requisitos: '+det+'.':''} IDs disponibles: ${ids}. Elige 6-10 IDs relevantes y estima cantidades para ${m2}m². Devuelve SOLO array JSON: [{"id":"demolicion_general","cantidad":75}]`;
-
-  try{
-    const r=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:600,messages:[{role:'user',content:prompt}]})});
-    const d=await r.json();
-    if(d.type==='error'||!d.content) throw new Error(d.error?.message||'Error IA');
-    const raw=d.content.map(i=>i.text||'').join('').replace(/```json|```/g,'').trim();
-    let depth=0,js=raw.indexOf('['),je=js;
-    for(let i=js;i<raw.length;i++){if(raw[i]==='[')depth++;else if(raw[i]===']'){depth--;if(depth===0){je=i+1;break;}}}
-    const arr=JSON.parse(raw.slice(js,je));
-    clearInterval(iv);
-
-    partidas=arr.filter(p=>DB[p.id]).map(p=>({
-      id:p.id,nombre:DB[p.id].nombre,unidad:DB[p.id].unidad,
-      precio:precio(p.id,cal),cantidad:p.cantidad
-    }));
-
-    const byId={}; partidas.forEach(p=>byId[p.id]=p);
-    let html=''; let done=new Set();
-    for(const [cat,ids] of Object.entries(CATS)){
-      const inc=ids.filter(id=>byId[id]); if(!inc.length) continue;
-      html+=`<div class="pt-row cat-row"><span>${cat}</span></div>`;
-      inc.forEach(id=>{
-        const p=byId[id]; done.add(id);
-        html+=`<div class="pt-row" id="r-${p.id}">
-          <div><div class="pt-name">${p.nombre}</div><div class="pt-ud">${p.unidad} · ${fmt(p.precio)}/ud</div></div>
-          <div class="pt-qty"><input type="number" id="q-${p.id}" value="${p.cantidad}" min="0" step="0.5" oninput="recalc()"></div>
-          <div class="pt-total" id="t-${p.id}">—</div>
-        </div>`;
-      });
-    }
-    partidas.filter(p=>!done.has(p.id)).forEach(p=>{
-      html+=`<div class="pt-row" id="r-${p.id}">
-        <div><div class="pt-name">${p.nombre}</div><div class="pt-ud">${p.unidad} · ${fmt(p.precio)}/ud</div></div>
-        <div class="pt-qty"><input type="number" id="q-${p.id}" value="${p.cantidad}" min="0" step="0.5" oninput="recalc()"></div>
-        <div class="pt-total" id="t-${p.id}">—</div>
-      </div>`;
-    });
-    document.getElementById('ptbody').innerHTML=html;
-    document.getElementById('sload').style.display='none';
-    document.getElementById('s2').style.display='block';
-    document.querySelector('footer').style.display='block';
-    recalc();
-  }catch(e){
-    clearInterval(iv);
-    alert('Error: '+e.message);
-    document.getElementById('sload').style.display='none';
-    document.getElementById('s1').style.display='block';
-    document.querySelector('footer').style.display='block';
-    setStep(1);
-  }
-};
-
-window.recalc=recalc;
-
-window.generarFinal=async()=>{
-  const cliente=document.getElementById('cliente').value||'Cliente';
-  const tipo=document.getElementById('tipo').value;
-  const ciudad=document.getElementById('ciudad').value;
-  const m2=document.getElementById('m2').value;
-  const cal=document.getElementById('calidad').value;
-
-  const lineas=partidas.map(p=>{
-    const q=parseFloat(document.getElementById('q-'+p.id)?.value||0);
-    return {...p,cantidad:q,total:q*p.precio};
-  }).filter(p=>p.cantidad>0);
-
-  const sub=lineas.reduce((s,p)=>s+p.total,0);
-  const iva=sub*0.21;
-  const total=sub+iva;
-
-  document.getElementById('s2').style.display='none';
-  document.getElementById('sload').style.display='block';
-  document.querySelector('footer').style.display='none';
-  document.getElementById('lstep').textContent='Redactando presupuesto profesional...';
-  setStep(3);
-
-  const numRef='PRE-2025-'+Math.floor(Math.random()*9000+1000);
-  const prompt=`Responde SOLO con este JSON exacto rellenando los valores, sin explicaciones:
-{"titulo":"TITULO","numero":"${numRef}","resumen":"RESUMEN","plazo_estimado":"PLAZO","validez":"30 días","nota_ia":"NOTA"}
-Datos: ${tipo}, ${m2}m², ${ciudad}, calidad ${cal}, total ${fmt(total)}.
-TITULO: nombre profesional corto. RESUMEN: 1 frase. PLAZO: X semanas. NOTA: 2 frases útiles para constructora.`;
-
-  try{
-    const r=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:400,messages:[{role:'user',content:prompt}]})});
-    const d=await r.json();
-    if(d.type==='error'||!d.content) throw new Error(d.error?.message||'Error');
-    const raw=d.content.map(i=>i.text||'').join('').replace(/```json|```/g,'').trim();
-    const js=raw.indexOf('{'); const je=raw.lastIndexOf('}')+1;
-    const meta=JSON.parse(raw.slice(js,je));
-
-    document.getElementById('sload').style.display='none';
-    document.getElementById('s3').style.display='block';
-    document.querySelector('footer').style.display='block';
-
-    const today=new Date().toLocaleDateString('es-ES',{day:'2-digit',month:'long',year:'numeric'});
-    const byId={}; lineas.forEach(l=>byId[l.id]=l);
-    let filas=''; let done=new Set();
-    for(const [cat,ids] of Object.entries(CATS)){
-      const inc=ids.filter(id=>byId[id]); if(!inc.length) continue;
-      filas+=`<tr><td class="cat-td" colspan="3">${cat}</td></tr>`;
-      inc.forEach(id=>{const l=byId[id];done.add(id);
-        filas+=`<tr><td>${l.nombre}<br><span style="font-size:0.78rem;color:#999">${l.cantidad} ${l.unidad}</span></td><td class="qty">${fmt(l.precio)}</td><td class="amt">${fmt(l.total)}</td></tr>`;
-      });
-    }
-    lineas.filter(l=>!done.has(l.id)).forEach(l=>{
-      filas+=`<tr><td>${l.nombre}<br><span style="font-size:0.78rem;color:#999">${l.cantidad} ${l.unidad}</span></td><td class="qty">${fmt(l.precio)}</td><td class="amt">${fmt(l.total)}</td></tr>`;
-    });
-
-    document.getElementById('presresult').innerHTML=`
-<div class="result-header">
-  <div class="result-num">${meta.numero} · ${today}</div>
-  <div class="result-title">${meta.titulo}</div>
-  <div class="result-sub">${meta.resumen}</div>
-  <div class="result-sub" style="margin-top:4px">Cliente: ${cliente}</div>
-  <span class="result-badge">✓ Precios verificados por IA</span>
-</div>
-
-<div class="card" style="padding:16px">
-  <table class="result-table">
-    <thead><tr><th>Concepto</th><th style="text-align:right">€/ud</th><th style="text-align:right">Total</th></tr></thead>
-    <tbody>${filas}</tbody>
-  </table>
-  <div class="result-totals">
-    <div class="result-row"><span>Subtotal (sin IVA)</span><span style="font-weight:600">${fmt(sub)}</span></div>
-    <div class="result-row"><span>IVA (21%)</span><span style="font-weight:600">${fmt(iva)}</span></div>
-    <div class="result-total-row"><span>TOTAL PRESUPUESTO</span><span>${fmt(total)}</span></div>
-  </div>
-  <div class="meta-info">
-    <span>📅 Plazo: <strong>${meta.plazo_estimado}</strong></span>
-    <span>⏱ Validez: <strong>${meta.validez}</strong></span>
-  </div>
-  <div class="ai-box"><strong>💡 Análisis IA</strong>${meta.nota_ia}</div>
-  <p class="disclaimer">*Este presupuesto es una estimación referencial. Los precios pueden variar según condiciones de la obra.</p>
-</div>
-
-<div class="action-btns">
-  <button class="action-btn" onclick="back2()">← Editar partidas</button>
-  <button class="action-btn" onclick="window.print()">🖨️ Descargar PDF</button>
-  <button class="action-btn gold" onclick="alert('En producción: envío por email')">✉️ Enviar por email</button>
-  <button class="action-btn" onclick="location.reload()">+ Nuevo presupuesto</button>
-</div>`;
-
-    window.scrollTo({top:0,behavior:'smooth'});
-  }catch(e){
-    alert('Error: '+e.message);
-    document.getElementById('sload').style.display='none';
-    document.getElementById('s2').style.display='block';
-    document.querySelector('footer').style.display='block';
-    setStep(2);
-  }
-};
-</script>
+  <script type="module" src="app.js"></script>
 </body>
 </html>
