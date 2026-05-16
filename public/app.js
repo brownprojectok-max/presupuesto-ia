@@ -141,10 +141,10 @@ window.goToStep2 = async () => {
     // Partidas fijas por tipo — elimina variabilidad de la IA
     const PARTIDAS_FIJAS = {
       // Reforma integral: sin fontaneria_completa (duplica puntos agua) ni electrica_cuadro (incluido en completa)
-      reforma_integral: ['demolicion_general','gestion_residuos','albanileria_general','albanileria_tabique','aislamiento_trasdosado','aislamiento_acustico','falso_techo_pladur','foseado_led','electrica_completa','fontaneria_bano','fontaneria_cocina','pavimento_parquet','alicatado_pared','pintura_total','ventana_aluminio','puerta_paso','split_ac','clima_conductos','caldera_condensacion','aerotermia','suelo_radiante_agua','bano_ducha_italiano','bano_sanitarios','bano_mampara','bano_griferia','cocina_muebles','cocina_encimera_silestone','limpieza_obra','proyecto_arquitecto'],
+      reforma_integral: ['demolicion_general','gestion_residuos','albanileria_general','ayudas_albanileria','albanileria_tabique','aislamiento_trasdosado','aislamiento_acustico','suelo_flotante_acustico','falso_techo_pladur','foseado_led','electrica_completa','fontaneria_bano','fontaneria_cocina','pavimento_parquet','alicatado_pared','pintura_total','ventana_aluminio','puerta_paso','split_ac','clima_conductos','caldera_condensacion','aerotermia','suelo_radiante_agua','bano_ducha_italiano','bano_sanitarios','bano_mampara','bano_griferia','cocina_muebles','cocina_encimera_silestone','limpieza_obra','proyecto_arquitecto'],
       reforma_parcial:  ['demolicion_general','gestion_residuos','albanileria_general','electrica_completa','pavimento_parquet','pintura_total','puerta_paso','limpieza_obra'],
       // Obra nueva: sin fontaneria_completa ni electrica_cuadro por misma razón
-      obra_nueva:       ['demolicion_general','gestion_residuos','albanileria_general','albanileria_tabique','falso_techo_pladur','electrica_completa','fontaneria_bano','fontaneria_cocina','pavimento_parquet','alicatado_pared','pintura_total','ventana_aluminio','puerta_paso','puerta_blindada','split_ac','bano_ducha_italiano','bano_sanitarios','bano_mampara','bano_griferia','cocina_muebles','cocina_encimera_silestone','limpieza_obra','proyecto_arquitecto'],
+      obra_nueva:       ['demolicion_general','gestion_residuos','albanileria_general','ayudas_albanileria','albanileria_tabique','aislamiento_trasdosado','aislamiento_acustico','suelo_flotante_acustico','falso_techo_pladur','foseado_led','electrica_completa','fontaneria_bano','fontaneria_cocina','pavimento_parquet','alicatado_pared','pintura_total','ventana_aluminio','puerta_paso','puerta_blindada','split_ac','clima_conductos','caldera_condensacion','aerotermia','suelo_radiante_agua','bano_ducha_italiano','bano_sanitarios','bano_mampara','bano_griferia','cocina_muebles','cocina_encimera_silestone','limpieza_obra','proyecto_arquitecto'],
       reforma_bano:     ['demolicion_general','gestion_residuos','albanileria_enfoscado','electrica_enchufe','fontaneria_bano','alicatado_pared','bano_ducha_italiano','bano_sanitarios','bano_mampara','bano_griferia','limpieza_obra'],
       reforma_cocina:   ['demolicion_general','gestion_residuos','albanileria_enfoscado','electrica_enchufe','electrica_punto_luz','fontaneria_cocina','alicatado_pared','cocina_muebles','cocina_encimera_silestone','limpieza_obra'],
       // Local comercial: mantiene cuadro separado (es un concepto distinto en locales)
@@ -204,8 +204,10 @@ window.goToStep2 = async () => {
       aerotermia: 1, // bomba de calor (unidad fija)
       suelo_radiante_agua: m2n, // tubo PE-X + colectores + aditivos por m²
       aislamiento_cubierta: m2n,
-      aislamiento_acustico: Math.round(m2n * 0.3), // medianeras principales (30% superficie)
-      foseado_led: Math.round(Math.sqrt(m2n) * 3), // ml estimados salón+dormitorio principal
+      ayudas_albanileria: 1, // partida alzada (precio = 11% de fontaneria+electrica, calculado post)
+      aislamiento_acustico: Math.round(m2n * 0.3), // medianeras: ~1 pared medianera estándar
+      foseado_led: Math.round(Math.sqrt(m2n) * 3), // sqrt(m²)×3 ml — salón+dormitorio principal
+      suelo_flotante_acustico: superficieParquet, // mismo m² que parquet (bajo tarima)
       suelo_radiante_agua: m2n, // m² totales para instalación completa
       proyecto_arquitecto: 1,
     };
@@ -255,13 +257,18 @@ window.goToStep2 = async () => {
           precioUnitario = calidadState === 'premium' ? 12 : calidadState === 'estándar' ? 6 : 9;
         }
         // Climatización: split solo para estándar, conductos+caldera para media_alta, aerotermia para premium
+        // Split: solo estándar
         if (p.id === 'split_ac' && (calidadState === 'media-alta' || calidadState === 'premium')) precioUnitario = 0;
-        if (p.id === 'clima_conductos' && calidadState === 'estándar') precioUnitario = 0;
-        if (p.id === 'caldera_condensacion' && calidadState === 'estándar') precioUnitario = 0;
+        // Conductos+caldera: solo media-alta (0 en estándar Y en premium)
+        if (p.id === 'clima_conductos' && calidadState !== 'media-alta') precioUnitario = 0;
+        if (p.id === 'caldera_condensacion' && calidadState !== 'media-alta') precioUnitario = 0;
+        // Aerotermia+suelo radiante: solo premium
         if (p.id === 'aerotermia' && calidadState !== 'premium') precioUnitario = 0;
         if (p.id === 'suelo_radiante_agua' && calidadState !== 'premium') precioUnitario = 0;
         if (p.id === 'aislamiento_acustico' && calidadState === 'estándar') precioUnitario = 0;
         if (p.id === 'foseado_led' && calidadState === 'estándar') precioUnitario = 0;
+        // Suelo flotante acustico: premium automatico, media-alta opcional (precio activo siempre que la partida exista)
+        if (p.id === 'suelo_flotante_acustico' && calidadState === 'estándar') precioUnitario = 0;
         if (p.id === 'aislamiento_cubierta') precioUnitario = 0; // solo si usuario marca ático
         return { id: p.id, nombre: PRECIOS_DB[p.id].nombre, unidad: PRECIOS_DB[p.id].unidad, precio: precioUnitario, cantidad: p.cantidad, cat };
       });
