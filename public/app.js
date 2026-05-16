@@ -121,11 +121,17 @@ window.goToStep2 = async () => {
 
   const ivaType = parseInt(document.getElementById('ivaType')?.value || '21');
   const numBanos = parseInt(document.getElementById('numBanos')?.value || '1');
+  const anioConstruccion = parseInt(document.getElementById('anioConstruccion')?.value || '2000');
+  const bajantesAntiguas = anioConstruccion < 1995;
   const distribucion = document.querySelector('input[name="distribucion"]:checked')?.value || 'no';
-  AppState.formData = { projectType:tipo, city:ciudad, surface:m2, quality:calidad, details:detalles, companyName:empresa, clientEmail:email, clientPhone:telefono, ivaType, numBanos, distribucion };
+  AppState.formData = { projectType:tipo, city:ciudad, surface:m2, quality:calidad, details:detalles, companyName:empresa, clientEmail:email, clientPhone:telefono, ivaType, numBanos, distribucion, anioConstruccion, bajantesAntiguas };
 
   // Show loading state
   setStep(2);
+  // Alert for old buildings
+  if (AppState.formData.bajantesAntiguas) {
+    setTimeout(() => showToast('⚠️ Edificio anterior a 1995 — se incluye partida de bajantes antiguas'), 500);
+  }
   document.getElementById('lineItemsContainer').innerHTML = `
     <div style="text-align:center;padding:60px 20px">
       <div class="ai-spinner" style="margin:0 auto 16px"></div>
@@ -197,6 +203,7 @@ window.goToStep2 = async () => {
       split_ac: Math.max(1, Math.round(m2n / 25)),
       aislamiento_sate: m2n,
       limpieza_obra: m2n,
+      bajantes_viejas: 2, // estimado: 1 bajante baño + 1 bajante cocina
       // Climatización por calidad: split=estandar, conductos+caldera=media_alta, aerotermia=premium
       // Cantidad 1 para todos — el precio unitario refleja la calidad (0€ si no aplica a esa calidad)
       clima_conductos: Math.max(1, Math.round(m2n / 70)),
@@ -207,12 +214,17 @@ window.goToStep2 = async () => {
       ayudas_albanileria: 1, // partida alzada (precio = 11% de fontaneria+electrica, calculado post)
       aislamiento_acustico: Math.round(m2n * 0.3), // medianeras: ~1 pared medianera estándar
       foseado_led: Math.round(Math.sqrt(m2n) * 3), // sqrt(m²)×3 ml — salón+dormitorio principal
-      suelo_flotante_acustico: superficieParquet, // mismo m² que parquet (bajo tarima)
+      // Media-alta: solo bajo parquet. Premium: m² totales (incluye zonas húmedas con elastómero)
+      suelo_flotante_acustico: calidadState === 'premium' ? m2n : superficieParquet,
       suelo_radiante_agua: m2n, // m² totales para instalación completa
       proyecto_arquitecto: 1,
     };
 
-    const idsParaTipo = PARTIDAS_FIJAS[tipo] || PARTIDAS_FIJAS['reforma_integral'];
+    const idsParaTipo = [...(PARTIDAS_FIJAS[tipo] || PARTIDAS_FIJAS['reforma_integral'])];
+    // Añadir bajantes viejas si edificio anterior a 1995
+    if (AppState.formData.bajantesAntiguas && ['reforma_integral','reforma_bano','reforma_cocina','obra_nueva'].includes(tipo)) {
+      if (!idsParaTipo.includes('bajantes_viejas')) idsParaTipo.push('bajantes_viejas');
+    }
     
     // Construir partidas directamente sin llamar a la IA para las cantidades
     const arr = idsParaTipo

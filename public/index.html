@@ -152,6 +152,20 @@
               </select>
             </div>
 
+            <!-- Año de construccion -->
+            <div class="field" id="anioConstruccionField">
+              <label class="field-label" for="anioConstruccion">Año de construcción del edificio</label>
+              <select id="anioConstruccion" class="field-input">
+                <option value="2010">Posterior a 2010 (edificio moderno)</option>
+                <option value="2000">2000-2010</option>
+                <option value="1990">1990-2000</option>
+                <option value="1980" selected>1980-1990</option>
+                <option value="1970">1970-1980</option>
+                <option value="1960">Anterior a 1970 (edificio muy antiguo)</option>
+              </select>
+              <p style="font-size:0.75rem;color:#999;margin-top:5px">Si el edificio es anterior a 1995 se incluye revisión de bajantes antiguas</p>
+            </div>
+
             <!-- Cambio de distribucion -->
             <div class="field" id="distribucionField" style="display:none">
               <label class="field-label">¿Implica cambio de distribución completa?</label>
