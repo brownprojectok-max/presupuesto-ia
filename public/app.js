@@ -138,11 +138,14 @@ window.goToStep2 = async () => {
   try {
     // Partidas fijas por tipo — elimina variabilidad de la IA
     const PARTIDAS_FIJAS = {
-      reforma_integral: ['demolicion_general','gestion_residuos','albanileria_general','albanileria_tabique','falso_techo_pladur','electrica_completa','electrica_cuadro','fontaneria_completa','fontaneria_bano','fontaneria_cocina','pavimento_parquet','alicatado_pared','pintura_total','ventana_aluminio','puerta_paso','bano_ducha_italiano','bano_sanitarios','bano_mampara','bano_griferia','cocina_muebles','cocina_encimera_silestone','limpieza_obra','proyecto_arquitecto'],
+      // Reforma integral: sin fontaneria_completa (duplica puntos agua) ni electrica_cuadro (incluido en completa)
+      reforma_integral: ['demolicion_general','gestion_residuos','albanileria_general','albanileria_tabique','falso_techo_pladur','electrica_completa','fontaneria_bano','fontaneria_cocina','pavimento_parquet','alicatado_pared','pintura_total','ventana_aluminio','puerta_paso','split_ac','bano_ducha_italiano','bano_sanitarios','bano_mampara','bano_griferia','cocina_muebles','cocina_encimera_silestone','limpieza_obra','proyecto_arquitecto'],
       reforma_parcial:  ['demolicion_general','gestion_residuos','albanileria_general','electrica_completa','pavimento_parquet','pintura_total','puerta_paso','limpieza_obra'],
-      obra_nueva:       ['demolicion_general','gestion_residuos','albanileria_general','albanileria_tabique','falso_techo_pladur','electrica_completa','electrica_cuadro','fontaneria_completa','fontaneria_bano','fontaneria_cocina','pavimento_parquet','alicatado_pared','pintura_total','ventana_aluminio','puerta_paso','puerta_blindada','bano_ducha_italiano','bano_sanitarios','bano_mampara','bano_griferia','cocina_muebles','cocina_encimera_silestone','split_ac','limpieza_obra','proyecto_arquitecto'],
+      // Obra nueva: sin fontaneria_completa ni electrica_cuadro por misma razón
+      obra_nueva:       ['demolicion_general','gestion_residuos','albanileria_general','albanileria_tabique','falso_techo_pladur','electrica_completa','fontaneria_bano','fontaneria_cocina','pavimento_parquet','alicatado_pared','pintura_total','ventana_aluminio','puerta_paso','puerta_blindada','split_ac','bano_ducha_italiano','bano_sanitarios','bano_mampara','bano_griferia','cocina_muebles','cocina_encimera_silestone','limpieza_obra','proyecto_arquitecto'],
       reforma_bano:     ['demolicion_general','gestion_residuos','albanileria_enfoscado','electrica_enchufe','fontaneria_bano','alicatado_pared','bano_ducha_italiano','bano_sanitarios','bano_mampara','bano_griferia','limpieza_obra'],
       reforma_cocina:   ['demolicion_general','gestion_residuos','albanileria_enfoscado','electrica_enchufe','electrica_punto_luz','fontaneria_cocina','alicatado_pared','cocina_muebles','cocina_encimera_silestone','limpieza_obra'],
+      // Local comercial: mantiene cuadro separado (es un concepto distinto en locales)
       local_comercial:  ['demolicion_general','gestion_residuos','albanileria_general','falso_techo_pladur','electrica_completa','electrica_cuadro','fontaneria_completa','pavimento_gres','pintura_total','ventana_aluminio','puerta_blindada','split_ac','limpieza_obra','proyecto_arquitecto'],
       oficinas:         ['demolicion_general','gestion_residuos','albanileria_tabique','falso_techo_pladur','electrica_completa','electrica_cuadro','pavimento_gres','pintura_total','split_ac','limpieza_obra','proyecto_arquitecto'],
       fachada:          ['aislamiento_sate','pintura_esmalte','ventana_aluminio','gestion_residuos','limpieza_obra','proyecto_arquitecto'],
@@ -158,7 +161,7 @@ window.goToStep2 = async () => {
       demolicion_general: m2n,
       gestion_residuos: 1,
       albanileria_general: m2n,
-      albanileria_tabique: Math.round(m2n * 0.3),
+      albanileria_tabique: Math.round(m2n * 0.85), // 85% segun aparejador (redistribucion completa)
       albanileria_enfoscado: Math.round(m2n * 0.4),
       falso_techo_pladur: m2n,
       electrica_completa: m2n,
@@ -170,7 +173,7 @@ window.goToStep2 = async () => {
       fontaneria_cocina: 3,
       pavimento_parquet: superficieParquet,
       pavimento_gres: m2n,
-      alicatado_pared: Math.round(m2n * 0.35),
+      alicatado_pared: Math.round(35 + m2n * 0.10), // bano(~11m2) + cocina(~14m2) + frente encimera(~10m2) + extra
       pintura_total: m2Pared,
       ventana_aluminio: Math.max(4, Math.round(m2n * 0.12)),
       puerta_paso: Math.max(3, Math.round(m2n / 15)),
