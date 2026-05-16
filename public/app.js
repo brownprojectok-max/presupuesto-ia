@@ -120,7 +120,9 @@ window.goToStep2 = async () => {
   }
 
   const ivaType = parseInt(document.getElementById('ivaType')?.value || '21');
-  AppState.formData = { projectType:tipo, city:ciudad, surface:m2, quality:calidad, details:detalles, companyName:empresa, clientEmail:email, clientPhone:telefono, ivaType };
+  const numBanos = parseInt(document.getElementById('numBanos')?.value || '1');
+  const distribucion = document.querySelector('input[name="distribucion"]:checked')?.value || 'no';
+  AppState.formData = { projectType:tipo, city:ciudad, surface:m2, quality:calidad, details:detalles, companyName:empresa, clientEmail:email, clientPhone:telefono, ivaType, numBanos, distribucion };
 
   // Show loading state
   setStep(2);
@@ -139,7 +141,7 @@ window.goToStep2 = async () => {
     // Partidas fijas por tipo — elimina variabilidad de la IA
     const PARTIDAS_FIJAS = {
       // Reforma integral: sin fontaneria_completa (duplica puntos agua) ni electrica_cuadro (incluido en completa)
-      reforma_integral: ['demolicion_general','gestion_residuos','albanileria_general','albanileria_tabique','falso_techo_pladur','electrica_completa','fontaneria_bano','fontaneria_cocina','pavimento_parquet','alicatado_pared','pintura_total','ventana_aluminio','puerta_paso','split_ac','bano_ducha_italiano','bano_sanitarios','bano_mampara','bano_griferia','cocina_muebles','cocina_encimera_silestone','limpieza_obra','proyecto_arquitecto'],
+      reforma_integral: ['demolicion_general','gestion_residuos','albanileria_general','albanileria_tabique','aislamiento_trasdosado','falso_techo_pladur','electrica_completa','fontaneria_bano','fontaneria_cocina','pavimento_parquet','alicatado_pared','pintura_total','ventana_aluminio','puerta_paso','split_ac','bano_ducha_italiano','bano_sanitarios','bano_mampara','bano_griferia','cocina_muebles','cocina_encimera_silestone','limpieza_obra','proyecto_arquitecto'],
       reforma_parcial:  ['demolicion_general','gestion_residuos','albanileria_general','electrica_completa','pavimento_parquet','pintura_total','puerta_paso','limpieza_obra'],
       // Obra nueva: sin fontaneria_completa ni electrica_cuadro por misma razón
       obra_nueva:       ['demolicion_general','gestion_residuos','albanileria_general','albanileria_tabique','falso_techo_pladur','electrica_completa','fontaneria_bano','fontaneria_cocina','pavimento_parquet','alicatado_pared','pintura_total','ventana_aluminio','puerta_paso','puerta_blindada','split_ac','bano_ducha_italiano','bano_sanitarios','bano_mampara','bano_griferia','cocina_muebles','cocina_encimera_silestone','limpieza_obra','proyecto_arquitecto'],
@@ -153,15 +155,20 @@ window.goToStep2 = async () => {
     };
 
     const m2n = parseFloat(m2);
-    const superficieParquet = Math.max(0, m2n - 12);
+    const numBanos = AppState.formData.numBanos || 1;
+    const distribucion = AppState.formData.distribucion || 'no';
+    const superficieParquet = Math.max(0, m2n - (12 * numBanos));
     const m2Pared = Math.round(m2n * 2.8);
+    const tabiqueriaPct = distribucion === 'si' ? 0.85 : 0.05; // 85% redistribucion completa, 5% solo rozas
+    const alicatadoTotal = Math.round((35 + m2n * 0.10) * numBanos); // escala con num baños
+    const aislamientoCTE = Math.round(m2n * 0.45); // perimetro fachada interior segun aparejador
 
-    // Cantidades calculadas matemáticamente — sin IA, siempre iguales
+    // Cantidades calculadas matemáticamente — deterministas, sin variabilidad
     const CANTIDADES_FIJAS = {
       demolicion_general: m2n,
       gestion_residuos: 1,
       albanileria_general: m2n,
-      albanileria_tabique: Math.round(m2n * 0.85), // 85% segun aparejador (redistribucion completa)
+      albanileria_tabique: Math.round(m2n * tabiqueriaPct),
       albanileria_enfoscado: Math.round(m2n * 0.4),
       falso_techo_pladur: m2n,
       electrica_completa: m2n,
@@ -169,20 +176,21 @@ window.goToStep2 = async () => {
       electrica_punto_luz: Math.round(m2n * 0.6),
       electrica_enchufe: Math.round(m2n * 0.5),
       fontaneria_completa: m2n,
-      fontaneria_bano: 3,
+      fontaneria_bano: 3 * numBanos,
       fontaneria_cocina: 3,
       pavimento_parquet: superficieParquet,
       pavimento_gres: m2n,
-      alicatado_pared: Math.round(35 + m2n * 0.10), // bano(~11m2) + cocina(~14m2) + frente encimera(~10m2) + extra
+      alicatado_pared: alicatadoTotal,
       pintura_total: m2Pared,
       ventana_aluminio: Math.max(4, Math.round(m2n * 0.12)),
       puerta_paso: Math.max(3, Math.round(m2n / 15)),
       puerta_blindada: 1,
       armario_empotrado: Math.round(m2n * 0.05),
-      bano_ducha_italiano: 1,
-      bano_sanitarios: 1,
-      bano_mampara: 1,
-      bano_griferia: 1,
+      bano_ducha_italiano: numBanos,
+      bano_sanitarios: numBanos,
+      bano_mampara: numBanos,
+      bano_griferia: numBanos,
+      aislamiento_trasdosado: aislamientoCTE,
       cocina_muebles: Math.max(4, Math.round(m2n * 0.07)),
       cocina_encimera_silestone: Math.max(3, Math.round(m2n * 0.05)),
       split_ac: Math.max(1, Math.round(m2n / 25)),
@@ -341,6 +349,11 @@ window.goToStep3 = async () => {
   AppState.budgetRef = 'PRE-' + new Date().getFullYear() + '-' + String(Math.floor(Math.random()*9000+1000));
 
   setStep(3);
+  // Show IVA notice only for 10% (particulares)
+  setTimeout(() => {
+    const ivaNotice = document.getElementById('ivaNotice');
+    if(ivaNotice) ivaNotice.style.display = AppState.formData.ivaType === 10 ? 'block' : 'none';
+  }, 100);
   // Fill header immediately
   document.getElementById('budgetRef').textContent = AppState.budgetRef;
   document.getElementById('budgetClient').textContent = AppState.formData.companyName || 'Cliente';
@@ -527,6 +540,15 @@ function showToast(msg) {
 // ═══════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', async () => {
   await loadPreciosDB();
+
+  // Show/hide banos and distribucion fields based on project type
+  document.getElementById('projectType').addEventListener('change', function() {
+    const tipo = this.value;
+    const needsBanos = ['reforma_integral','obra_nueva'].includes(tipo);
+    const needsDist  = ['reforma_integral','obra_nueva'].includes(tipo);
+    document.getElementById('numBanosField').style.display = needsBanos ? 'block' : 'none';
+    document.getElementById('distribucionField').style.display = needsDist ? 'block' : 'none';
+  });
 
   document.getElementById('quality').addEventListener('change', function() {
     updateQualityBadge(this.value);

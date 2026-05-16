@@ -141,6 +141,33 @@
               </div>
             </div>
 
+            <!-- Numero de baños -->
+            <div class="field" id="numBanosField" style="display:none">
+              <label class="field-label" for="numBanos">Número de cuartos de baño <span style="color:#e53e3e">*</span></label>
+              <select id="numBanos" class="field-input">
+                <option value="1">1 baño</option>
+                <option value="2">2 baños</option>
+                <option value="3">3 baños</option>
+                <option value="4">4 o más baños</option>
+              </select>
+            </div>
+
+            <!-- Cambio de distribucion -->
+            <div class="field" id="distribucionField" style="display:none">
+              <label class="field-label">¿Implica cambio de distribución completa?</label>
+              <div class="toggle-group" style="display:flex;gap:10px;margin-top:4px">
+                <label class="toggle-option" style="flex:1;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:0.88rem">
+                  <input type="radio" name="distribucion" id="distSi" value="si" style="width:auto">
+                  <span><strong>Sí</strong> — Redistribución completa</span>
+                </label>
+                <label class="toggle-option" style="flex:1;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:0.88rem">
+                  <input type="radio" name="distribucion" id="distNo" value="no" checked style="width:auto">
+                  <span><strong>No</strong> — Distribución existente</span>
+                </label>
+              </div>
+              <p style="font-size:0.78rem;color:#999;margin-top:6px">Sí: 85% superficie en tabiquería · No: 5% (solo tapar rozas)</p>
+            </div>
+
             <div class="field">
               <label class="field-label" for="details">Detalles adicionales <span class="optional">(opcional)</span></label>
               <textarea id="details" class="field-input field-textarea" rows="4" placeholder="Describe aspectos específicos del proyecto, condicionantes especiales, materiales preferidos, etc."></textarea>
@@ -352,6 +379,12 @@
           </div>
           <div class="ai-result" id="aiResult" style="display:none"></div>
         </div>
+      </div>
+
+      <!-- Aviso legal IVA -->
+      <div id="ivaNotice" style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:14px 16px;margin-bottom:16px;font-size:0.8rem;color:#92400e;line-height:1.65">
+        <strong>⚠️ Aviso legal sobre el tipo de IVA aplicado:</strong><br>
+        El IVA reducido del <strong>10%</strong> para particulares está sujeto a que: (1) la vivienda lleve al menos 2 años construida antes del inicio de obras, (2) el coste de materiales aportados por el contratista no supere el 40% del total de la obra, y (3) el uso sea residencial privado (no alquiler comercial). En caso de duda, consulte con su asesor fiscal antes de firmar el contrato.
       </div>
 
       <!-- Action buttons -->
