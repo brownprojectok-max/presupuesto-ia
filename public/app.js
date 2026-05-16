@@ -157,6 +157,7 @@ window.goToStep2 = async () => {
       local_comercial:  ['demolicion_general','gestion_residuos','albanileria_general','falso_techo_pladur','electrica_completa','electrica_cuadro','fontaneria_completa','pavimento_gres','pintura_total','ventana_aluminio','puerta_blindada','split_ac','limpieza_obra','proyecto_arquitecto'],
       oficinas:         ['demolicion_general','gestion_residuos','albanileria_tabique','falso_techo_pladur','electrica_completa','electrica_cuadro','pavimento_gres','pintura_total','split_ac','limpieza_obra','proyecto_arquitecto'],
       fachada:          ['aislamiento_sate','pintura_esmalte','ventana_aluminio','gestion_residuos','limpieza_obra','proyecto_arquitecto'],
+      comunidad_vecinos: ['demolicion_general','gestion_residuos','albanileria_general','electrica_completa','pavimento_gres','alicatado_pared','pintura_total','puerta_blindada','limpieza_obra','proyecto_arquitecto'],
       cubierta:         ['aislamiento_sate','gestion_residuos','limpieza_obra','proyecto_arquitecto'],
     };
 
@@ -411,6 +412,15 @@ window.goToStep3 = async () => {
   document.getElementById('budgetTotalPreview').textContent = formatCurrency(total);
   document.getElementById('finalSurface').textContent = AppState.formData.surface + ' m²';
   document.getElementById('final-subtotal').textContent = formatCurrency(sub);
+  // Desglose Obra vs Equipamiento (cocina_muebles + cocina_encimera + proyecto_arquitecto)
+  const lineasEquip = lineas.filter(l => ['cocina_muebles','cocina_encimera_silestone','proyecto_arquitecto'].includes(l.id));
+  const costoEquip = lineasEquip.reduce((s,l) => s + l.total, 0);
+  const costoObra = sub - costoEquip;
+  const desgloEl = document.getElementById('desglose-obra-equip');
+  if(desgloEl) {
+    desgloEl.style.display = costoEquip > 0 ? 'block' : 'none';
+    desgloEl.innerHTML = '<strong>Desglose orientativo:</strong><br>Coste de ejecución de obra: <strong>' + formatCurrency(costoObra) + '</strong><br>Equipamiento y licencias: <strong>' + formatCurrency(costoEquip) + '</strong>';
+  }
   const ivaPctLabel = AppState.formData.ivaType || 21;
   document.getElementById('final-iva').textContent = formatCurrency(iva);
   // Update IVA label if element exists
@@ -570,7 +580,7 @@ function getProjectTypeLabel(type) {
   const labels = {
     reforma_integral:'Reforma integral de vivienda', reforma_parcial:'Reforma parcial',
     obra_nueva:'Obra nueva', reforma_bano:'Reforma de baño', reforma_cocina:'Reforma de cocina',
-    local_comercial:'Local comercial', oficinas:'Oficinas', fachada:'Rehabilitación de fachada', cubierta:'Reforma de cubierta',
+    local_comercial:'Local comercial', oficinas:'Oficinas', fachada:'Rehabilitación de fachada', cubierta:'Reforma de cubierta', comunidad_vecinos:'Reforma portal / Comunidad vecinos',
   };
   return labels[type] || type;
 }
@@ -589,13 +599,22 @@ function showToast(msg) {
 document.addEventListener('DOMContentLoaded', async () => {
   await loadPreciosDB();
 
-  // Show/hide banos and distribucion fields based on project type
+  // Show/hide fields and warnings based on project type
   document.getElementById('projectType').addEventListener('change', function() {
     const tipo = this.value;
     const needsBanos = ['reforma_integral','obra_nueva'].includes(tipo);
     const needsDist  = ['reforma_integral','obra_nueva'].includes(tipo);
     document.getElementById('numBanosField').style.display = needsBanos ? 'block' : 'none';
     document.getElementById('distribucionField').style.display = needsDist ? 'block' : 'none';
+    // Warnings
+    const obraWarn = document.getElementById('obraNewaWarning');
+    const comInfo = document.getElementById('comunidadInfo');
+    if(obraWarn) obraWarn.style.display = tipo === 'obra_nueva' ? 'block' : 'none';
+    if(comInfo) comInfo.style.display = tipo === 'comunidad_vecinos' ? 'block' : 'none';
+    // IVA auto para comunidad
+    const ivaSelect = document.getElementById('ivaType');
+    if(ivaSelect && tipo === 'comunidad_vecinos') ivaSelect.value = '10';
+    else if(ivaSelect && tipo !== 'comunidad_vecinos') ivaSelect.value = '21';
   });
 
   document.getElementById('quality').addEventListener('change', function() {

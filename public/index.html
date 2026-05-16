@@ -102,12 +102,13 @@
                     <option value="">Seleccionar tipo…</option>
                     <option value="reforma_integral">Reforma integral de vivienda</option>
                     <option value="reforma_parcial">Reforma parcial</option>
-                    <option value="obra_nueva">Obra nueva</option>
+                    <option value="obra_nueva">Terminación vivienda en bruto / Chalet escala gris</option>
                     <option value="reforma_bano">Reforma de baño</option>
                     <option value="reforma_cocina">Reforma de cocina</option>
                     <option value="local_comercial">Local comercial</option>
                     <option value="oficinas">Oficinas</option>
                     <option value="fachada">Rehabilitación de fachada</option>
+                    <option value="comunidad_vecinos">Reforma portal / Comunidad vecinos (IVA 10%)</option>
                     <option value="cubierta">Reforma de cubierta</option>
                   </select>
                   <span class="select-arrow">›</span>
@@ -227,6 +228,12 @@
             <div class="info-box">
               <span class="info-icon">💡</span>
               <p class="info-text">PresupuestoIA generará las partidas de obra automáticamente basándose en el tipo de proyecto, superficie y calidad seleccionados.</p>
+            </div>
+            <div id="obraNewaWarning" style="display:none;background:#fef3c7;border:1px solid #f59e0b;border-radius:8px;padding:12px 14px;margin-top:8px;font-size:0.82rem;color:#92400e;line-height:1.6">
+              <strong>⚠️ Aviso:</strong> Este presupuesto cubre únicamente las partidas de distribución e instalaciones interiores. La cimentación, estructura portante, fachada y cubierta se presupuestan aparte mediante proyecto de arquitectura personalizado.
+            </div>
+            <div id="comunidadInfo" style="display:none;background:#eff6ff;border:1px solid #93c5fd;border-radius:8px;padding:12px 14px;margin-top:8px;font-size:0.82rem;color:#1e3a8a;line-height:1.6">
+              <strong>ℹ️ IVA reducido 10%:</strong> Las reformas en zonas comunes de comunidades de propietarios tributan al 10% cuando la comunidad actúa como consumidor final.
             </div>
 
             <!-- Estimate preview -->
@@ -400,6 +407,9 @@
         <strong>⚠️ Aviso legal sobre el tipo de IVA aplicado:</strong><br>
         El IVA reducido del <strong>10%</strong> para particulares está sujeto a que: (1) la vivienda lleve al menos 2 años construida antes del inicio de obras, (2) el coste de materiales aportados por el contratista no supere el 40% del total de la obra, y (3) el uso sea residencial privado (no alquiler comercial). En caso de duda, consulte con su asesor fiscal antes de firmar el contrato.
       </div>
+
+      <!-- Desglose Obra vs Equipamiento -->
+      <div id="desglose-obra-equip" style="display:none;background:#f0f4ff;border:1px solid #c5d3f5;border-radius:8px;padding:14px 16px;margin-bottom:16px;font-size:0.82rem;color:#1e3a8a;line-height:1.8"></div>
 
       <!-- Action buttons -->
       <div class="action-buttons-grid">
