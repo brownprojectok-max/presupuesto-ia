@@ -1011,3 +1011,104 @@ body {
 
 /* ─── NUMBER FORMATTING UTILITIES ─── */
 .num-tabular { font-variant-numeric: tabular-nums; }
+
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE RESPONSIVE — Added
+   ═══════════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+
+  /* NAVBAR */
+  .navbar-inner { padding: 0 16px; height: 56px; }
+  .logo-text { font-size: 1rem; }
+  .nav-links { gap: 8px; }
+  .nav-link { display: none; }
+  .btn-nav { font-size: 0.78rem; padding: 6px 12px; }
+
+  /* STEPPER */
+  .stepper-bar { padding: 0 16px; }
+  .stepper-inner { gap: 0; }
+  .step-label { display: none; }
+  .step-circle { width: 28px; height: 28px; font-size: 0.8rem; }
+  .step-line { flex: 1; margin: 0 4px; }
+
+  /* MAIN */
+  .main-container { padding: 16px; max-width: 100%; }
+
+  /* SECTION HEADER */
+  .section-title { font-size: 1.3rem; }
+  .section-subtitle { font-size: 0.88rem; }
+
+  /* CARDS */
+  .card { padding: 16px; border-radius: 10px; }
+  .card-header { margin-bottom: 12px; }
+  .card-title { font-size: 0.95rem; }
+
+  /* FORM GRID — single column */
+  .form-grid { grid-template-columns: 1fr; gap: 12px; }
+  .field-group-2 { grid-template-columns: 1fr; }
+
+  /* INPUTS — bigger touch targets */
+  .field-input { padding: 13px 14px; font-size: 1rem; min-height: 48px; }
+  .field-textarea { min-height: 90px; }
+  .field-label { font-size: 0.78rem; }
+
+  /* STEP ACTIONS */
+  .step-actions { margin-top: 16px; }
+  .step-actions-row { flex-direction: column; gap: 10px; }
+  .btn-primary, .btn-secondary, .btn-cta { width: 100%; min-height: 52px; font-size: 0.95rem; justify-content: center; }
+
+  /* SUMMARY BAR */
+  .summary-bar { position: static; border-radius: 10px; margin: 0 0 16px; }
+  .summary-bar-inner { flex-direction: column; gap: 8px; padding: 14px 16px; }
+  .summary-divider { display: none; }
+  .summary-item { flex-direction: row; justify-content: space-between; align-items: center; }
+  .summary-value-total { font-size: 1.1rem; }
+
+  /* LINE ITEMS TABLE */
+  .lt-head { grid-template-columns: 1fr 80px 80px !important; }
+  .lt-head span:nth-child(2), .lt-head span:nth-child(4) { display: none; }
+  .lt-row { grid-template-columns: 1fr 80px 80px !important; }
+  .lt-unit, .lt-price { display: none; }
+  .lt-concept { font-size: 0.85rem; }
+  .lt-qty input { width: 70px; }
+
+  /* BUDGET HEADER CARD */
+  .budget-header-inner { flex-direction: column; gap: 12px; }
+  .budget-header-right { align-items: flex-start; }
+  .budget-title { font-size: 1.2rem; }
+  .budget-meta { flex-wrap: wrap; gap: 8px; }
+
+  /* INFO CARDS ROW */
+  .info-cards-row { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .info-mini-card { padding: 14px; }
+  .info-mini-value { font-size: 1rem; }
+
+  /* TOTALS CARD */
+  .totals-card { padding: 16px; }
+  .totals-value-total { font-size: 1.4rem; }
+
+  /* ACTION BUTTONS GRID */
+  .action-buttons-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .btn-action { font-size: 0.82rem; padding: 12px 10px; min-height: 48px; }
+
+  /* FINAL TABLE */
+  .final-table th:nth-child(2), .final-table td:nth-child(2),
+  .final-table th:nth-child(3), .final-table td:nth-child(3) { display: none; }
+  .final-table td, .final-table th { padding: 8px 10px; font-size: 0.84rem; }
+
+  /* AI BOX */
+  .ai-analysis-card { padding: 16px; }
+  .ai-title { font-size: 0.95rem; }
+
+  /* FOOTER */
+  .footer-inner { flex-direction: column; gap: 8px; text-align: center; }
+  .footer-text { font-size: 0.78rem; }
+}
+
+@media (max-width: 400px) {
+  .action-buttons-grid { grid-template-columns: 1fr; }
+  .info-cards-row { grid-template-columns: 1fr; }
+  .navbar-inner { padding: 0 12px; }
+  .main-container { padding: 12px; }
+}
