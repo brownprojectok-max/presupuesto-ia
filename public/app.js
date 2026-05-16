@@ -141,7 +141,7 @@ window.goToStep2 = async () => {
     // Partidas fijas por tipo — elimina variabilidad de la IA
     const PARTIDAS_FIJAS = {
       // Reforma integral: sin fontaneria_completa (duplica puntos agua) ni electrica_cuadro (incluido en completa)
-      reforma_integral: ['demolicion_general','gestion_residuos','albanileria_general','albanileria_tabique','aislamiento_trasdosado','falso_techo_pladur','electrica_completa','fontaneria_bano','fontaneria_cocina','pavimento_parquet','alicatado_pared','pintura_total','ventana_aluminio','puerta_paso','split_ac','bano_ducha_italiano','bano_sanitarios','bano_mampara','bano_griferia','cocina_muebles','cocina_encimera_silestone','limpieza_obra','proyecto_arquitecto'],
+      reforma_integral: ['demolicion_general','gestion_residuos','albanileria_general','albanileria_tabique','aislamiento_trasdosado','falso_techo_pladur','electrica_completa','fontaneria_bano','fontaneria_cocina','pavimento_parquet','alicatado_pared','pintura_total','ventana_aluminio','puerta_paso','split_ac','clima_conductos','caldera_condensacion','bano_ducha_italiano','bano_sanitarios','bano_mampara','bano_griferia','cocina_muebles','cocina_encimera_silestone','limpieza_obra','proyecto_arquitecto'],
       reforma_parcial:  ['demolicion_general','gestion_residuos','albanileria_general','electrica_completa','pavimento_parquet','pintura_total','puerta_paso','limpieza_obra'],
       // Obra nueva: sin fontaneria_completa ni electrica_cuadro por misma razón
       obra_nueva:       ['demolicion_general','gestion_residuos','albanileria_general','albanileria_tabique','falso_techo_pladur','electrica_completa','fontaneria_bano','fontaneria_cocina','pavimento_parquet','alicatado_pared','pintura_total','ventana_aluminio','puerta_paso','puerta_blindada','split_ac','bano_ducha_italiano','bano_sanitarios','bano_mampara','bano_griferia','cocina_muebles','cocina_encimera_silestone','limpieza_obra','proyecto_arquitecto'],
@@ -157,10 +157,11 @@ window.goToStep2 = async () => {
     const m2n = parseFloat(m2);
     const numBanos = AppState.formData.numBanos || 1;
     const distribucion = AppState.formData.distribucion || 'no';
-    const superficieParquet = Math.max(0, m2n - (12 * numBanos));
+    const superficieParquet = Math.max(0, m2n - (6 * numBanos) - 8); // 6m² por baño + 8m² cocina fija
     const m2Pared = Math.round(m2n * 2.8);
     const tabiqueriaPct = distribucion === 'si' ? 0.85 : 0.05; // 85% redistribucion completa, 5% solo rozas
-    const alicatadoTotal = Math.round((35 + m2n * 0.10) * numBanos); // escala con num baños
+    const mlEncimera = Math.max(4, Math.round(m2n * 0.07));
+    const alicatadoTotal = Math.round((25 * numBanos) + (mlEncimera * 0.60)); // 25m²/baño + frente cocina
     const aislamientoCTE = Math.round(m2n * 0.45); // perimetro fachada interior segun aparejador
 
     // Cantidades calculadas matemáticamente — deterministas, sin variabilidad
@@ -196,6 +197,12 @@ window.goToStep2 = async () => {
       split_ac: Math.max(1, Math.round(m2n / 25)),
       aislamiento_sate: m2n,
       limpieza_obra: m2n,
+      // Climatización por calidad: split=estandar, conductos+caldera=media_alta, aerotermia=premium
+      // Cantidad 1 para todos — el precio unitario refleja la calidad (0€ si no aplica a esa calidad)
+      clima_conductos: Math.max(1, Math.round(m2n / 70)),
+      caldera_condensacion: 1,
+      aerotermia: 1,
+      aislamiento_cubierta: m2n,
       proyecto_arquitecto: 1,
     };
 
@@ -228,13 +235,28 @@ window.goToStep2 = async () => {
 
     clearInterval(iv);
 
+    // Ajuste de precio unitario según condiciones del proyecto
+    const distribucionState = AppState.formData.distribucion || 'no';
+    const calidadState = AppState.formData.quality || 'media-alta';
+
     AppState.lineItems = finalArr
       .filter(p => PRECIOS_DB[p.id])
       .map(p => {
         // Find category
         let cat = 'otros';
-        for (const [c, ids] of Object.entries(CAT_MAP)) { if (ids.includes(p.id)) { cat = c; break; } }
-        return { id: p.id, nombre: PRECIOS_DB[p.id].nombre, unidad: PRECIOS_DB[p.id].unidad, precio: getPrecio(p.id, calidad), cantidad: p.cantidad, cat };
+        for (const [catKey, ids] of Object.entries(CAT_MAP)) { if (ids.includes(p.id)) { cat = catKey; break; } }
+        let precioUnitario = getPrecio(p.id, calidad);
+        // Pintura más barata si no hay redistribución (sobre paramento existente)
+        if (p.id === 'pintura_total' && distribucionState === 'no') {
+          precioUnitario = calidadState === 'premium' ? 12 : calidadState === 'estándar' ? 6 : 9;
+        }
+        // Climatización: split solo para estándar, conductos+caldera para media_alta, aerotermia para premium
+        if (p.id === 'split_ac' && (calidadState === 'media-alta' || calidadState === 'premium')) precioUnitario = 0;
+        if (p.id === 'clima_conductos' && calidadState === 'estándar') precioUnitario = 0;
+        if (p.id === 'caldera_condensacion' && calidadState === 'estándar') precioUnitario = 0;
+        if (p.id === 'aerotermia' && calidadState !== 'premium') precioUnitario = 0;
+        if (p.id === 'aislamiento_cubierta') precioUnitario = 0; // solo si usuario marca ático
+        return { id: p.id, nombre: PRECIOS_DB[p.id].nombre, unidad: PRECIOS_DB[p.id].unidad, precio: precioUnitario, cantidad: p.cantidad, cat };
       });
 
     renderLineItems();
