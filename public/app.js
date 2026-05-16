@@ -136,31 +136,88 @@ window.goToStep2 = async () => {
   const iv = setInterval(() => { si=(si+1)%steps.length; const el=document.getElementById('aiStep'); if(el) el.textContent=steps[si]; }, 1200);
 
   try {
-    const ids = Object.keys(PRECIOS_DB).join(', ');
-    const isIntegral = tipo.includes('integral') || tipo.includes('nueva');
-    const extraIds = isIntegral ? ' Incluye SIEMPRE: cocina_muebles, cocina_encimera_silestone, alicatado_pared, falso_techo_pladur.' : '';
-    const prompt = `Eres experto en presupuestos construcción España. Proyecto: ${getProjectTypeLabel(tipo)}, ${m2}m², ${ciudad}, calidad ${calidad}.${detalles ? ' Requisitos: '+detalles+'.' : ''}${extraIds}
-IDs disponibles: ${ids}.
-Elige 12-16 IDs y estima cantidades realistas para ${m2}m².
-REGLAS: pintura_total en m² de PARED (superficie_suelo x 2.8). parquet solo en zonas sin baño/cocina (resta 12m²). fontaneria_bano y fontaneria_cocina en puntos de agua (3 puntos cada uno).
-Devuelve SOLO array JSON: [{"id":"demolicion_general","cantidad":75}]`;
+    // Partidas fijas por tipo — elimina variabilidad de la IA
+    const PARTIDAS_FIJAS = {
+      reforma_integral: ['demolicion_general','gestion_residuos','albanileria_general','albanileria_tabique','falso_techo_pladur','electrica_completa','electrica_cuadro','fontaneria_completa','fontaneria_bano','fontaneria_cocina','pavimento_parquet','alicatado_pared','pintura_total','ventana_aluminio','puerta_paso','bano_ducha_italiano','bano_sanitarios','bano_mampara','bano_griferia','cocina_muebles','cocina_encimera_silestone','limpieza_obra','proyecto_arquitecto'],
+      reforma_parcial:  ['demolicion_general','gestion_residuos','albanileria_general','electrica_completa','pavimento_parquet','pintura_total','puerta_paso','limpieza_obra'],
+      obra_nueva:       ['demolicion_general','gestion_residuos','albanileria_general','albanileria_tabique','falso_techo_pladur','electrica_completa','electrica_cuadro','fontaneria_completa','fontaneria_bano','fontaneria_cocina','pavimento_parquet','alicatado_pared','pintura_total','ventana_aluminio','puerta_paso','puerta_blindada','bano_ducha_italiano','bano_sanitarios','bano_mampara','bano_griferia','cocina_muebles','cocina_encimera_silestone','split_ac','limpieza_obra','proyecto_arquitecto'],
+      reforma_bano:     ['demolicion_general','gestion_residuos','albanileria_enfoscado','electrica_enchufe','fontaneria_bano','alicatado_pared','bano_ducha_italiano','bano_sanitarios','bano_mampara','bano_griferia','limpieza_obra'],
+      reforma_cocina:   ['demolicion_general','gestion_residuos','albanileria_enfoscado','electrica_enchufe','electrica_punto_luz','fontaneria_cocina','alicatado_pared','cocina_muebles','cocina_encimera_silestone','limpieza_obra'],
+      local_comercial:  ['demolicion_general','gestion_residuos','albanileria_general','falso_techo_pladur','electrica_completa','electrica_cuadro','fontaneria_completa','pavimento_gres','pintura_total','ventana_aluminio','puerta_blindada','split_ac','limpieza_obra','proyecto_arquitecto'],
+      oficinas:         ['demolicion_general','gestion_residuos','albanileria_tabique','falso_techo_pladur','electrica_completa','electrica_cuadro','pavimento_gres','pintura_total','split_ac','limpieza_obra','proyecto_arquitecto'],
+      fachada:          ['aislamiento_sate','pintura_esmalte','ventana_aluminio','gestion_residuos','limpieza_obra','proyecto_arquitecto'],
+      cubierta:         ['aislamiento_sate','gestion_residuos','limpieza_obra','proyecto_arquitecto'],
+    };
 
-    const r = await fetch('/api/ai', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model:'claude-sonnet-4-5', max_tokens:800, messages:[{ role:'user', content:prompt }] })
-    });
-    const data = await r.json();
-    if (data.type === 'error' || !data.content) throw new Error(data.error?.message || 'Error IA');
+    const m2n = parseFloat(m2);
+    const superficieParquet = Math.max(0, m2n - 12);
+    const m2Pared = Math.round(m2n * 2.8);
 
-    const raw = data.content.map(i => i.text||'').join('').replace(/```json|```/g,'').trim();
-    let depth=0, js=raw.indexOf('['), je=js;
-    for(let i=js;i<raw.length;i++){ if(raw[i]==='[')depth++; else if(raw[i]===']'){depth--;if(depth===0){je=i+1;break;}} }
-    const arr = JSON.parse(raw.slice(js, je));
+    // Cantidades calculadas matemáticamente — sin IA, siempre iguales
+    const CANTIDADES_FIJAS = {
+      demolicion_general: m2n,
+      gestion_residuos: 1,
+      albanileria_general: m2n,
+      albanileria_tabique: Math.round(m2n * 0.3),
+      albanileria_enfoscado: Math.round(m2n * 0.4),
+      falso_techo_pladur: m2n,
+      electrica_completa: m2n,
+      electrica_cuadro: 1,
+      electrica_punto_luz: Math.round(m2n * 0.6),
+      electrica_enchufe: Math.round(m2n * 0.5),
+      fontaneria_completa: m2n,
+      fontaneria_bano: 3,
+      fontaneria_cocina: 3,
+      pavimento_parquet: superficieParquet,
+      pavimento_gres: m2n,
+      alicatado_pared: Math.round(m2n * 0.35),
+      pintura_total: m2Pared,
+      ventana_aluminio: Math.max(4, Math.round(m2n * 0.12)),
+      puerta_paso: Math.max(3, Math.round(m2n / 15)),
+      puerta_blindada: 1,
+      armario_empotrado: Math.round(m2n * 0.05),
+      bano_ducha_italiano: 1,
+      bano_sanitarios: 1,
+      bano_mampara: 1,
+      bano_griferia: 1,
+      cocina_muebles: Math.max(4, Math.round(m2n * 0.07)),
+      cocina_encimera_silestone: Math.max(3, Math.round(m2n * 0.05)),
+      split_ac: Math.max(1, Math.round(m2n / 25)),
+      aislamiento_sate: m2n,
+      limpieza_obra: m2n,
+      proyecto_arquitecto: 1,
+    };
+
+    const idsParaTipo = PARTIDAS_FIJAS[tipo] || PARTIDAS_FIJAS['reforma_integral'];
+    
+    // Construir partidas directamente sin llamar a la IA para las cantidades
+    const arr = idsParaTipo
+      .filter(id => PRECIOS_DB[id])
+      .map(id => ({ id, cantidad: CANTIDADES_FIJAS[id] || 1 }));
+
+    // Añadir detalles adicionales si los hay (única parte que usa IA)
+    let finalArr = arr;
+    if (detalles && detalles.length > 10) {
+      // Solo usamos IA para interpretar detalles especiales
+      try {
+        const promptDetalles = `El cliente pide esto extra: "${detalles}". De estos IDs adicionales: armario_empotrado, split_ac, suelo_radiante, pavimento_microcemento, puerta_blindada, split_ac. Devuelve SOLO array JSON de los que apliquen con cantidad estimada para ${m2}m²: [{"id":"armario_empotrado","cantidad":3}] o [] si no aplica ninguno.`;
+        const rd = await fetch('/api/ai', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ model:'claude-sonnet-4-5', max_tokens:200, messages:[{role:'user',content:promptDetalles}] }) });
+        const dd = await rd.json();
+        if (dd.content) {
+          const rawD = dd.content.map(i=>i.text||'').join('').replace(/```json|```/g,'').trim();
+          const jsD = rawD.indexOf('['); const jeD = rawD.lastIndexOf(']')+1;
+          if (jsD >= 0) {
+            const extras = JSON.parse(rawD.slice(jsD,jeD));
+            const existingIds = new Set(finalArr.map(p=>p.id));
+            extras.forEach(e => { if(!existingIds.has(e.id) && PRECIOS_DB[e.id]) finalArr.push(e); });
+          }
+        }
+      } catch(e2) { /* ignore extra details error */ }
+    }
 
     clearInterval(iv);
 
-    AppState.lineItems = arr
+    AppState.lineItems = finalArr
       .filter(p => PRECIOS_DB[p.id])
       .map(p => {
         // Find category
