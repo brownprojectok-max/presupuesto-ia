@@ -136,7 +136,7 @@ window.goToStep2 = async () => {
 
   try {
     const ids = Object.keys(PRECIOS_DB).join(', ');
-    const prompt = `Proyecto: ${getProjectTypeLabel(tipo)}, ${m2}m², ${ciudad}, calidad ${calidad}.${detalles ? ' Requisitos: ' + detalles + '.' : ''} IDs disponibles: ${ids}. Elige 6-10 IDs relevantes y estima cantidades para ${m2}m². Devuelve SOLO array JSON: [{"id":"demolicion_general","cantidad":75}]`;
+    const prompt = `Proyecto: ${getProjectTypeLabel(tipo)}, ${m2}m², ${ciudad}, calidad ${calidad}.${detalles ? ' Requisitos: ' + detalles + '.' : ''} IDs disponibles: ${ids}. Elige 10-14 IDs relevantes y estima cantidades para ${m2}m². Devuelve SOLO array JSON: [{"id":"demolicion_general","cantidad":75}]`;
 
     const r = await fetch('/api/ai', {
       method: 'POST',
@@ -181,6 +181,7 @@ function renderLineItems() {
   AppState.lineItems.forEach(p => byId[p.id] = p);
   let html = '';
 
+  const renderedIds = new Set();
   for (const cat of CATEGORIES) {
     const items = AppState.lineItems.filter(p => p.cat === cat.id);
     if (!items.length) continue;
@@ -206,6 +207,27 @@ function renderLineItems() {
       </div>`;
     });
 
+    html += `</div></div>`;
+    items.forEach(p => renderedIds.add(p.id));
+  }
+
+  // Render any items not matched to a category
+  const unmatched = AppState.lineItems.filter(p => !renderedIds.has(p.id));
+  if (unmatched.length) {
+    html += `<div class="line-items-group">
+      <div class="group-header"><span class="group-icon">📋</span><span class="group-label">Otros</span></div>
+      <div class="line-items-table">
+        <div class="lt-head"><span>Concepto</span><span>Ud.</span><span>Cantidad</span><span>€/ud</span><span>Total</span></div>`;
+    unmatched.forEach(p => {
+      const total = p.cantidad * p.precio;
+      html += `<div class="lt-row" id="row-${p.id}">
+        <span class="lt-concept">${p.nombre}</span>
+        <span class="lt-unit">${p.unidad}</span>
+        <span class="lt-qty"><input type="number" value="${p.cantidad}" min="0" step="0.5" onchange="updateQty('${p.id}', this.value)"></span>
+        <span class="lt-price">${formatCurrency(p.precio)}</span>
+        <span class="lt-total" id="tot-${p.id}">${formatCurrency(total)}</span>
+      </div>`;
+    });
     html += `</div></div>`;
   }
 
@@ -320,11 +342,13 @@ function renderFinalItems(lineas) {
   let html = `<table class="final-table">
     <thead><tr><th>Concepto</th><th>Cant.</th><th>€/ud</th><th>Total</th></tr></thead><tbody>`;
 
+  const renderedFinal = new Set();
   for (const cat of CATEGORIES) {
     const items = lineas.filter(p => p.cat === cat.id);
     if (!items.length) continue;
     html += `<tr class="final-cat-row"><td colspan="4">${cat.icon} ${cat.label}</td></tr>`;
     items.forEach(p => {
+      renderedFinal.add(p.id);
       html += `<tr>
         <td>${p.nombre}<br><small style="color:#999">${p.cantidad} ${p.unidad}</small></td>
         <td style="text-align:right;color:#666">${p.cantidad}</td>
@@ -333,6 +357,16 @@ function renderFinalItems(lineas) {
       </tr>`;
     });
   }
+
+  // Unmatched items
+  lineas.filter(p => !renderedFinal.has(p.id)).forEach(p => {
+    html += `<tr>
+      <td>${p.nombre}<br><small style="color:#999">${p.cantidad} ${p.unidad}</small></td>
+      <td style="text-align:right;color:#666">${p.cantidad}</td>
+      <td style="text-align:right;color:#666">${formatCurrency(p.precio)}</td>
+      <td style="text-align:right;font-weight:600">${formatCurrency(p.cantidad*p.precio)}</td>
+    </tr>`;
+  });
 
   html += '</tbody></table>';
   container.innerHTML = html;
