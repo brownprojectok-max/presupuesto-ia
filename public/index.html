@@ -167,6 +167,17 @@
               <p style="font-size:0.75rem;color:#999;margin-top:5px">Si el edificio es anterior a 1995 se incluye revisión de bajantes antiguas</p>
             </div>
 
+            <!-- Nivel rampa (solo comunidad) -->
+            <div class="field" id="nivelRampaField" style="display:none">
+              <label class="field-label" for="nivelRampa">Desnivel del acceso al portal</label>
+              <select id="nivelRampa" class="field-input">
+                <option value="bajo">Bajo — 1 o 2 escalones (rampa hasta 2m) · 1.400 EUR</option>
+                <option value="medio" selected>Medio — 3 o 4 escalones (rampa 2-4m) · 2.200 EUR</option>
+                <option value="alto">Alto — 5 o mas escalones o giros complejos · 3.500 EUR</option>
+              </select>
+              <p style="font-size:0.75rem;color:#999;margin-top:5px">Determina el coste de la rampa de accesibilidad CTE (independiente del nivel de calidad)</p>
+            </div>
+
             <!-- Num viviendas (solo comunidad) -->
             <div class="field" id="numViviendasField" style="display:none">
               <label class="field-label" for="numViviendas">Numero de viviendas en el edificio</label>

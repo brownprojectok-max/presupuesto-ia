@@ -122,6 +122,7 @@ window.goToStep2 = async () => {
   const ivaType = parseInt(document.getElementById('ivaType')?.value || '21');
   const numBanos = parseInt(document.getElementById('numBanos')?.value || '1');
   const numViviendas = parseInt(document.getElementById('numViviendas')?.value || '10');
+  const nivelRampa = document.getElementById('nivelRampa')?.value || 'medio';
   const anioConstruccion = parseInt(document.getElementById('anioConstruccion')?.value || '2000');
   const numViviendas = parseInt(document.getElementById('numViviendas')?.value || '8');
   const nivelRampa = document.getElementById('nivelRampa')?.value || 'no';
@@ -160,7 +161,7 @@ window.goToStep2 = async () => {
       local_comercial:  ['demolicion_general','gestion_residuos','albanileria_general','falso_techo_pladur','electrica_completa','electrica_cuadro','fontaneria_completa','pavimento_gres','pintura_total','ventana_aluminio','puerta_blindada','split_ac','limpieza_obra','proyecto_arquitecto'],
       oficinas:         ['demolicion_general','gestion_residuos','albanileria_tabique','falso_techo_pladur','electrica_completa','electrica_cuadro','pavimento_gres','pintura_total','split_ac','limpieza_obra','proyecto_arquitecto'],
       fachada:          ['aislamiento_sate','pintura_esmalte','ventana_aluminio','gestion_residuos','limpieza_obra','proyecto_arquitecto'],
-      comunidad_vecinos: ['demolicion_general','gestion_residuos','albanileria_general','rampa_accesibilidad_cte','electrica_completa','pavimento_gres','alicatado_pared','pintura_total','puerta_blindada','instalacion_videoportero','limpieza_obra','proyecto_arquitecto'],
+      comunidad_vecinos: ['demolicion_general','gestion_residuos','albanileria_general','rampa_accesibilidad_cte','pasamanos_rampa_inox','electrica_completa','pavimento_gres','alicatado_pared','pintura_total','puerta_blindada','instalacion_videoportero','limpieza_obra','proyecto_arquitecto'],
       cubierta:         ['aislamiento_sate','gestion_residuos','limpieza_obra','proyecto_arquitecto'],
     };
 
@@ -209,6 +210,7 @@ window.goToStep2 = async () => {
       limpieza_obra: m2n,
       bajantes_viejas: 2, // estimado: 1 bajante bano + 1 bajante cocina
       rampa_accesibilidad_cte: 1, // partida alzada — 1 ud por portal
+      pasamanos_rampa_inox: AppState.formData?.nivelRampa === 'bajo' ? 4 : AppState.formData?.nivelRampa === 'alto' ? 10 : 6, // ml x 2 lados
       instalacion_videoportero: 1, // precio = fijo(850) + variable(190 x num_viviendas) — calculado en Firestore como base
       rampa_accesibilidad_cte: 1, // partida alzada (1 ud independiente del m²)
       instalacion_videoportero: 1, // placa fija + monitores por num_viviendas (campo adicional)
@@ -292,8 +294,11 @@ window.goToStep2 = async () => {
           const nv = AppState.formData.numViviendas || 10;
           precioUnitario = 850 + (190 * nv);
         }
-        // Rampa accesibilidad: partida alzada fija de Firestore (1 ud)
-        if (p.id === 'rampa_accesibilidad_cte') precioUnitario = getPrecio(p.id, calidad);
+        // Rampa accesibilidad: precio por desnivel (independiente de calidad estetica)
+        if (p.id === 'rampa_accesibilidad_cte') {
+          const nr = AppState.formData.nivelRampa || 'medio';
+          precioUnitario = nr === 'bajo' ? 1400 : nr === 'alto' ? 3500 : 2200;
+        }
         // Suelo flotante acustico: premium automatico, media-alta opcional (precio activo siempre que la partida exista)
         if (p.id === 'suelo_flotante_acustico' && calidadState === 'estándar') precioUnitario = 0;
         if (p.id === 'aislamiento_cubierta') precioUnitario = 0; // solo si usuario marca ático
@@ -305,7 +310,14 @@ window.goToStep2 = async () => {
           const nr = AppState.formData.nivelRampa || 'no';
           precioUnitario = nr === 'no' ? 0 : nr === 'bajo' ? 1600 : nr === 'alto' ? 2800 : 2200;
         }
-        return { id: p.id, nombre: PRECIOS_DB[p.id].nombre, unidad: PRECIOS_DB[p.id].unidad, precio: precioUnitario, cantidad: p.cantidad, cat };
+        let nombrePartida = PRECIOS_DB[p.id].nombre;
+        // Texto dinamico pavimento gres en portal segun calidad
+        if (p.id === 'pavimento_gres' && AppState.formData.projectType === 'comunidad_vecinos') {
+          nombrePartida = calidadState === 'premium'
+            ? 'Pavimento piedra natural (Marmol o Granito abujardado) antideslizante CTE DB-SUA'
+            : 'Gres porcelanico tecnico antideslizante Clase 3 (CTE DB-SUA)';
+        }
+        return { id: p.id, nombre: nombrePartida, unidad: PRECIOS_DB[p.id].unidad, precio: precioUnitario, cantidad: p.cantidad, cat };
       });
 
     renderLineItems();
@@ -636,6 +648,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Num viviendas field only for comunidad
     const numVivField = document.getElementById('numViviendasField');
     if(numVivField) numVivField.style.display = tipo === 'comunidad_vecinos' ? 'block' : 'none';
+    const nivelRampaField = document.getElementById('nivelRampaField');
+    if(nivelRampaField) nivelRampaField.style.display = tipo === 'comunidad_vecinos' ? 'block' : 'none';
     const comCampos = document.getElementById('comunidadCampos');
     if(comCampos) comCampos.style.display = tipo === 'comunidad_vecinos' ? 'block' : 'none';
     // IVA auto para comunidad
