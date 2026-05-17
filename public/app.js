@@ -149,12 +149,12 @@ window.goToStep2 = async () => {
     // Partidas fijas por tipo — elimina variabilidad de la IA
     const PARTIDAS_FIJAS = {
       // Reforma integral: sin fontaneria_completa (duplica puntos agua) ni electrica_cuadro (incluido en completa)
-      reforma_integral: ['demolicion_general','gestion_residuos','albanileria_general','ayudas_albanileria','albanileria_tabique','aislamiento_trasdosado','aislamiento_acustico','suelo_flotante_acustico','falso_techo_pladur','foseado_led','electrica_completa','fontaneria_bano','fontaneria_cocina','pavimento_parquet','alicatado_pared','pintura_total','ventana_aluminio','puerta_paso','split_ac','clima_conductos','caldera_condensacion','aerotermia','suelo_radiante_agua','bano_ducha_italiano','bano_sanitarios','bano_mampara','bano_griferia','cocina_muebles','cocina_encimera_silestone','limpieza_obra','proyecto_arquitecto'],
+      reforma_integral: ['demolicion_general','gestion_residuos','albanileria_general','ayudas_albanileria','albanileria_tabique','aislamiento_trasdosado','aislamiento_acustico','suelo_flotante_acustico','falso_techo_pladur','foseado_led','electrica_completa','fontaneria_bano','fontaneria_cocina','pavimento_parquet','solado_ceramico_bano','solado_ceramico_cocina','alicatado_pared','pintura_total','ventana_aluminio','puerta_paso','split_ac','clima_conductos','caldera_condensacion','aerotermia','suelo_radiante_agua','bano_ducha_italiano','bano_sanitarios','bano_mampara','bano_griferia','cocina_muebles','cocina_encimera_silestone','bajantes_viejas','limpieza_obra','proyecto_arquitecto'],
       reforma_parcial:  ['demolicion_general','gestion_residuos','albanileria_general','electrica_completa','pavimento_parquet','pintura_total','puerta_paso','limpieza_obra'],
       // Obra nueva: sin fontaneria_completa ni electrica_cuadro por misma razón
-      obra_nueva:       ['demolicion_general','gestion_residuos','albanileria_general','ayudas_albanileria','albanileria_tabique','aislamiento_trasdosado','aislamiento_acustico','suelo_flotante_acustico','falso_techo_pladur','foseado_led','electrica_completa','fontaneria_bano','fontaneria_cocina','pavimento_parquet','alicatado_pared','pintura_total','ventana_aluminio','puerta_paso','puerta_blindada','split_ac','clima_conductos','caldera_condensacion','aerotermia','suelo_radiante_agua','bano_ducha_italiano','bano_sanitarios','bano_mampara','bano_griferia','cocina_muebles','cocina_encimera_silestone','limpieza_obra','proyecto_arquitecto'],
-      reforma_bano:     ['demolicion_general','gestion_residuos','albanileria_enfoscado','electrica_enchufe','fontaneria_bano','alicatado_pared','solado_ceramico_bano','bano_ducha_italiano','bano_sanitarios','bano_mampara','bano_griferia','bajantes_viejas','limpieza_obra'],
-      reforma_cocina:   ['demolicion_general','gestion_residuos','albanileria_enfoscado','electrica_enchufe','electrica_punto_luz','fontaneria_cocina','alicatado_pared','solado_ceramico_cocina','cocina_muebles','cocina_encimera_silestone','bajantes_viejas','limpieza_obra'],
+      obra_nueva:       ['demolicion_general','gestion_residuos','albanileria_general','ayudas_albanileria','albanileria_tabique','aislamiento_trasdosado','aislamiento_acustico','suelo_flotante_acustico','falso_techo_pladur','foseado_led','electrica_completa','fontaneria_bano','fontaneria_cocina','pavimento_parquet','solado_ceramico_bano','solado_ceramico_cocina','alicatado_pared','pintura_total','ventana_aluminio','puerta_paso','puerta_blindada','split_ac','clima_conductos','caldera_condensacion','aerotermia','suelo_radiante_agua','bano_ducha_italiano','bano_sanitarios','bano_mampara','bano_griferia','cocina_muebles','cocina_encimera_silestone','bajantes_viejas','limpieza_obra','proyecto_arquitecto'],
+      reforma_bano:     ['demolicion_general','gestion_residuos','albanileria_enfoscado','electrica_enchufe','fontaneria_bano','alicatado_pared','solado_ceramico_bano','bano_ducha_italiano','bano_sanitarios','bano_mampara','bano_griferia','limpieza_obra'],
+      reforma_cocina:   ['demolicion_general','gestion_residuos','albanileria_enfoscado','electrica_enchufe','electrica_punto_luz','fontaneria_cocina','alicatado_pared','solado_ceramico_cocina','cocina_muebles','cocina_encimera_silestone','limpieza_obra'],
       // Local comercial: mantiene cuadro separado (es un concepto distinto en locales)
       local_comercial:  ['demolicion_general','gestion_residuos','albanileria_general','falso_techo_pladur','electrica_completa','electrica_cuadro','fontaneria_completa','pavimento_gres','pintura_total','ventana_aluminio','puerta_blindada','split_ac','limpieza_obra','proyecto_arquitecto'],
       oficinas:         ['demolicion_general','gestion_residuos','albanileria_tabique','falso_techo_pladur','electrica_completa','electrica_cuadro','pavimento_gres','pintura_total','split_ac','limpieza_obra','proyecto_arquitecto'],
@@ -237,7 +237,7 @@ window.goToStep2 = async () => {
       aislamiento_acustico: Math.round(m2n * 0.3), // medianeras: ~1 pared medianera estándar
       foseado_led: Math.round(Math.sqrt(m2n) * 3), // sqrt(m²)×3 ml — salón+dormitorio principal
       // Media-alta: solo bajo parquet. Premium: m² totales (incluye zonas húmedas con elastómero)
-      suelo_flotante_acustico: calidadState === 'premium' ? m2n : superficieParquet,
+      suelo_flotante_acustico: superficieParquet, // siempre m2 parquet — en premium el suelo radiante ya incluye aislamiento integrado
       suelo_radiante_agua: m2n, // m² totales para instalación completa
       proyecto_arquitecto: 1,
     };
@@ -321,7 +321,7 @@ window.goToStep2 = async () => {
           const nr = AppState.formData.nivelRampa || 'medio';
           precioUnitario = nr === 'bajo' ? 1400 : nr === 'alto' ? 3500 : 2200;
         }
-        // Suelo flotante acustico: 0 en estandar
+        // Suelo flotante acustico: 0 en estandar, en premium cantidad = m2 parquet (no totales — bajo suelo radiante va integrado)
         if (p.id === 'suelo_flotante_acustico' && calidadState === 'estándar') precioUnitario = 0;
         if (p.id === 'aislamiento_cubierta') precioUnitario = 0;
         let nombrePartida = PRECIOS_DB[p.id].nombre;
