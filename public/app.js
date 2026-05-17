@@ -126,7 +126,7 @@ window.goToStep2 = async () => {
   const anioConstruccion = parseInt(document.getElementById('anioConstruccion')?.value || '2000');
   const bajantesAntiguas = anioConstruccion < 1995;
   const distribucion = document.querySelector('input[name="distribucion"]:checked')?.value || 'no';
-  AppState.formData = { projectType:tipo, city:ciudad, surface:m2, quality:calidad, details:detalles, companyName:empresa, clientEmail:email, clientPhone:telefono, ivaType, numBanos, distribucion, anioConstruccion, bajantesAntiguas, numViviendas, nivelRampa };
+  AppState.formData = { projectType:tipo, city:ciudad, surface:m2, quality:calidad, details:detalles, companyName:empresa, clientEmail:email, clientPhone:telefono, ivaType, numBanos, distribucion, anioConstruccion, bajantesAntiguas, numViviendas, nivelRampa, cotaCero };
 
   // Show loading state
   setStep(2);
@@ -159,18 +159,20 @@ window.goToStep2 = async () => {
       local_comercial:  ['demolicion_general','gestion_residuos','albanileria_general','falso_techo_pladur','electrica_completa','electrica_cuadro','fontaneria_completa','pavimento_gres','pintura_total','ventana_aluminio','puerta_blindada','split_ac','limpieza_obra','proyecto_arquitecto'],
       oficinas:         ['demolicion_general','gestion_residuos','albanileria_tabique','falso_techo_pladur','electrica_completa','electrica_cuadro','pavimento_gres','pintura_total','split_ac','limpieza_obra','proyecto_arquitecto'],
       fachada:          ['aislamiento_sate','pintura_esmalte','ventana_aluminio','gestion_residuos','limpieza_obra','proyecto_arquitecto'],
-      comunidad_vecinos: ['demolicion_general','gestion_residuos','albanileria_general','rampa_accesibilidad_cte','pasamanos_rampa_inox','electrica_completa','alumbrado_emergencia','pavimento_gres','alicatado_pared','pintura_total','puerta_blindada','control_accesos','instalacion_videoportero','buzon_comunitario','felpudo_tecnico','tablon_espejo','proteccion_ascensor','limpieza_obra','proyecto_arquitecto'],
+      comunidad_vecinos: ['demolicion_general','gestion_residuos','albanileria_general','rampa_accesibilidad_cte','pasamanos_rampa_inox','electrica_completa','alumbrado_emergencia','pavimento_gres','alicatado_pared','pintura_total','puerta_blindada','control_accesos','instalacion_videoportero','buzon_comunitario','felpudo_tecnico','tablon_espejo','proteccion_ascensor','bajada_cota_cero','limpieza_obra','proyecto_arquitecto'],
       cubierta:         ['aislamiento_sate','gestion_residuos','limpieza_obra','proyecto_arquitecto'],
     };
 
     const m2n = parseFloat(m2);
     const numBanos = AppState.formData.numBanos || 1;
     const distribucion = AppState.formData.distribucion || 'no';
-    const superficieParquet = Math.max(0, m2n - (6 * numBanos) - 8); // 6m² por baño + 8m² cocina fija
+    const soladoBanoPorBano = Math.max(3.5, Math.min(7.5, m2n * 0.06));
+    const soladoCocina = Math.max(5.0, Math.min(14.0, m2n * 0.09));
+    const superficieParquet = Math.max(0, Math.round((m2n - (soladoBanoPorBano * numBanos) - soladoCocina) * 10) / 10);
     const m2Pared = Math.round(m2n * 2.8);
     const tabiqueriaPct = distribucion === 'si' ? 0.85 : 0.05; // 85% redistribucion completa, 5% solo rozas
     const mlEncimera = Math.max(4, Math.round(m2n * 0.07));
-    const alicatadoTotal = Math.round((25 * numBanos) + (mlEncimera * 0.60) + (6 * numBanos) + 8); // paredes (25m2/bano + frente cocina) + suelos (6m2/bano + 8m2 cocina)
+    const alicatadoTotal = Math.round((25 * numBanos) + (mlEncimera * 0.60)); // SOLO paredes — suelos van en solado_ceramico_bano y solado_ceramico_cocina
     const aislamientoCTE = Math.round(m2n * 0.45); // perimetro fachada interior segun aparejador
 
     // Cantidades calculadas matemáticamente — deterministas, sin variabilidad
@@ -211,13 +213,15 @@ window.goToStep2 = async () => {
       pasamanos_rampa_inox: AppState.formData?.nivelRampa === 'bajo' ? 5.2 : AppState.formData?.nivelRampa === 'alto' ? 11.2 : 7.2, // ml x 2 lados + 1.2ml prolongaciones CTE DB-SUA
       instalacion_videoportero: 1,
       buzon_comunitario: 1,
-      solado_ceramico_bano: 6 * numBanos, // suelo bano estimado 6m2/bano
-      solado_ceramico_cocina: 8, // suelo cocina estimado 8m2 fijo
+      // Solado hibrido acotado (recomendacion aparejador v13)
+      solado_ceramico_bano: Math.round(Math.max(3.5, Math.min(7.5, m2n * 0.06)) * numBanos * 10) / 10, // max(3.5, min(7.5, m2*0.06)) x banos
+      solado_ceramico_cocina: Math.round(Math.max(5.0, Math.min(14.0, m2n * 0.09)) * 10) / 10, // max(5.0, min(14.0, m2*0.09))
       control_accesos: 1,
       proteccion_ascensor: 1,
       felpudo_tecnico: 1,
-      control_accesos: 1, // lector RFID/teclado numerico — 1 ud por portal
-      proteccion_ascensor: 1, // tableros madera/policel — 1 ud por reforma
+      control_accesos: 1,
+      proteccion_ascensor: 1,
+      bajada_cota_cero: 0, // partida opcional — se activa si usuario marca checkbox en formulario
       tablon_espejo: 1, // 1 ud por portal
       alumbrado_emergencia: 1, // 1 ud alzada por portal
       rampa_accesibilidad_cte: 1, // partida alzada (1 ud independiente del m²)
@@ -297,6 +301,11 @@ window.goToStep2 = async () => {
         if (p.id === 'suelo_radiante_agua' && calidadState !== 'premium') precioUnitario = 0;
         if (p.id === 'aislamiento_acustico' && calidadState === 'estándar') precioUnitario = 0;
         if (p.id === 'foseado_led' && calidadState === 'estándar') precioUnitario = 0;
+        // Bajada cota cero: solo si usuario activa el checkbox
+        if (p.id === 'bajada_cota_cero') {
+          precioUnitario = AppState.formData.cotaCero === 'si' ? getPrecio(p.id, calidad) : 0;
+          if (AppState.formData.cotaCero === 'si') p = {...p, cantidad: 1};
+        }
         // Videoportero: precio dinamico = 850 fijo + 190 * num_viviendas
         if (p.id === 'instalacion_videoportero') {
           const nv = AppState.formData.numViviendas || 10;
@@ -661,6 +670,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if(numVivField) numVivField.style.display = tipo === 'comunidad_vecinos' ? 'block' : 'none';
     const nivelRampaField = document.getElementById('nivelRampaField');
     if(nivelRampaField) nivelRampaField.style.display = tipo === 'comunidad_vecinos' ? 'block' : 'none';
+    const cotaCeroField = document.getElementById('cotaCeroField');
+    if(cotaCeroField) cotaCeroField.style.display = tipo === 'comunidad_vecinos' ? 'block' : 'none';
     const comCampos = document.getElementById('comunidadCampos');
     if(comCampos) comCampos.style.display = tipo === 'comunidad_vecinos' ? 'block' : 'none';
     // IVA auto para comunidad

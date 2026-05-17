@@ -178,6 +178,22 @@
               <p style="font-size:0.75rem;color:#999;margin-top:5px">Determina el coste de la rampa de accesibilidad CTE (independiente del nivel de calidad)</p>
             </div>
 
+            <!-- Bajada cota cero (solo comunidad) -->
+            <div class="field" id="cotaCeroField" style="display:none">
+              <label class="field-label">¿Es necesario bajar el ascensor a cota cero?</label>
+              <div class="toggle-group" style="display:flex;gap:10px;margin-top:4px">
+                <label style="flex:1;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:0.88rem">
+                  <input type="radio" name="cotaCero" value="no" checked style="width:auto">
+                  <span><strong>No</strong> — Portal accesible con rampa</span>
+                </label>
+                <label style="flex:1;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:0.88rem">
+                  <input type="radio" name="cotaCero" value="si" style="width:auto">
+                  <span><strong>Sí</strong> — Requiere recalce estructural</span>
+                </label>
+              </div>
+              <p style="font-size:0.75rem;color:#e53e3e;margin-top:6px">⚠️ Estimación orientativa ~12.500 EUR. Sujeto a estudio de viabilidad por técnico ascensorista.</p>
+            </div>
+
             <!-- Num viviendas (solo comunidad) -->
             <div class="field" id="numViviendasField" style="display:none">
               <label class="field-label" for="numViviendas">Numero de viviendas en el edificio</label>
