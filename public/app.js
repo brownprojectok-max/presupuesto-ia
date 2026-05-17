@@ -127,7 +127,7 @@ window.goToStep2 = async () => {
   const anioConstruccion = parseInt(document.getElementById('anioConstruccion')?.value || '2000');
   const bajantesAntiguas = anioConstruccion < 1995;
   const distribucion = document.querySelector('input[name="distribucion"]:checked')?.value || 'no';
-  AppState.formData = { projectType:tipo, city:ciudad, surface:m2, quality:calidad, details:detalles, companyName:empresa, clientEmail:email, clientPhone:telefono, ivaType, numBanos, distribucion, anioConstruccion, bajantesAntiguas, numViviendas, nivelRampa, cotaCero, tieneGotele };
+  AppState.formData = { projectType:tipo, city:ciudad, surface:m2, quality:calidad, details:detalles, companyName:empresa, clientEmail:email, clientPhone:telefono, ivaType, numBanos, distribucion, anioConstruccion, bajantesAntiguas, numViviendas, nivelRampa, cotaCero, tieneGotele, tipoChalet };
 
   // Show loading state
   setStep(2);
@@ -196,10 +196,8 @@ window.goToStep2 = async () => {
       alicatado_pared: alicatadoTotal,
       pintura_total: m2Pared,
       ventana_aluminio: Math.max(4, Math.round(m2n * 0.12)),
-      // Cap dinamico de puertas segun superficie (aparejador v15)
-      puerta_paso: m2n <= 90 ? Math.min(7, Math.max(3, Math.round(m2n/15))) :
-                   m2n <= 140 ? Math.min(10, Math.max(3, Math.round(m2n/15))) :
-                   Math.min(15, Math.max(3, Math.round(m2n/15))),
+      // Cap puertas: min 3, max 15 (el valor natural m2/15 es correcto hasta 140m2)
+      puerta_paso: Math.min(15, Math.max(3, Math.round(m2n/15))),
       puerta_blindada: 1,
       armario_empotrado: Math.round(m2n * 0.05),
       bano_ducha_italiano: numBanos,
@@ -208,7 +206,7 @@ window.goToStep2 = async () => {
       bano_griferia: numBanos,
       aislamiento_trasdosado: aislamientoCTE,
       cocina_muebles: Math.max(4, Math.min(7, Math.round(m2n * 0.07))), // cap 7ml
-      cocina_encimera_silestone: Math.max(3, Math.min(6, Math.round(m2n * 0.05))), // cap 6ml
+      cocina_encimera_silestone: Math.max(3, Math.min(7, Math.round(m2n * 0.05))), // cap 7ml — igual que muebles para no dejar encimera descubierta
       split_ac: Math.max(1, Math.round(m2n / 25)),
       aislamiento_sate: m2n,
       limpieza_obra: m2n,
@@ -290,15 +288,20 @@ window.goToStep2 = async () => {
         let cat = 'otros';
         for (const [catKey, ids] of Object.entries(CAT_MAP)) { if (ids.includes(p.id)) { cat = catKey; break; } }
         let precioUnitario = getPrecio(p.id, calidad);
-        // Pintura: multiplicador sobre precio de calidad + suplemento gotelé
+        // Pintura: gotele y redistrib son mutuamente excluyentes en el multiplicador
+        // Si hay gotele: precio_calidad + 12 EUR (saneado integral, no aplica *1.25 adicional)
+        // Si redistrib sin gotele: precio_calidad * 1.25
+        // Si ninguno: precio_calidad base
         if (p.id === 'pintura_total') {
           const precioBaseCalidad = getPrecio('pintura_total', calidad);
-          const precioConRedistrib = distribucionState === 'si'
-            ? Math.round(precioBaseCalidad * 1.25)
-            : precioBaseCalidad;
-          // Suplemento gotele: +12 EUR/m2 de pared si hay gotelé que eliminar
           const tieneGotele = AppState.formData.tieneGotele === 'si';
-          precioUnitario = tieneGotele ? precioConRedistrib + 12 : precioConRedistrib;
+          if (tieneGotele) {
+            precioUnitario = precioBaseCalidad + 12; // saneado integral incluye redistrib
+          } else if (distribucionState === 'si') {
+            precioUnitario = Math.round(precioBaseCalidad * 1.25); // solo rozas y tendidos
+          } else {
+            precioUnitario = precioBaseCalidad; // pintura sobre paramento existente liso
+          }
         }
         // Climatización: split solo para estándar, conductos+caldera para media_alta, aerotermia para premium
         // Split: solo estándar
@@ -310,8 +313,11 @@ window.goToStep2 = async () => {
         if (p.id === 'aerotermia' && calidadState !== 'premium') precioUnitario = 0;
         if (p.id === 'suelo_radiante_agua' && calidadState !== 'premium') precioUnitario = 0;
         if (p.id === 'aislamiento_acustico' && calidadState === 'estándar') precioUnitario = 0;
-        // Sin aislamiento acustico en obra nueva/chalet (sin vecinos medianeros)
-        if (p.id === 'aislamiento_acustico' && AppState.formData.projectType === 'obra_nueva') precioUnitario = 0;
+        // Aislamiento acustico en obra_nueva: solo 0 si chalet AISLADO (no adosado/pareado)
+        if (p.id === 'aislamiento_acustico' && AppState.formData.projectType === 'obra_nueva') {
+          if (AppState.formData.tipoChalet === 'aislado') precioUnitario = 0;
+          // Si adosado/pareado: mantiene precio normal (comparte medianera con vecino)
+        }
         if (p.id === 'foseado_led' && calidadState === 'estándar') precioUnitario = 0;
         // Bajada cota cero: solo si usuario activa el checkbox
         if (p.id === 'bajada_cota_cero') {
@@ -686,6 +692,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if(cotaCeroField) cotaCeroField.style.display = tipo === 'comunidad_vecinos' ? 'block' : 'none';
     const goteleField = document.getElementById('goteleField');
     if(goteleField) goteleField.style.display = ['reforma_integral','obra_nueva'].includes(tipo) ? 'block' : 'none';
+    const tipoChaletField = document.getElementById('tipoChaletField');
+    if(tipoChaletField) tipoChaletField.style.display = tipo === 'obra_nueva' ? 'block' : 'none';
     const comCampos = document.getElementById('comunidadCampos');
     if(comCampos) comCampos.style.display = tipo === 'comunidad_vecinos' ? 'block' : 'none';
     // IVA auto para comunidad

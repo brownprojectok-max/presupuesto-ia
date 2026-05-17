@@ -208,6 +208,22 @@
               <p style="font-size:0.75rem;color:#999;margin-top:5px">Usado para calcular el videoportero digital (850 EUR fijo + 190 EUR/vivienda)</p>
             </div>
 
+            <!-- Tipo chalet (solo obra_nueva) -->
+            <div class="field" id="tipoChaletField" style="display:none">
+              <label class="field-label">Tipo de edificacion</label>
+              <div class="toggle-group" style="display:flex;gap:10px;margin-top:4px">
+                <label style="flex:1;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:0.88rem">
+                  <input type="radio" name="tipoChalet" value="aislado" checked style="width:auto">
+                  <span><strong>Aislado</strong> — Sin vecinos en medianeras</span>
+                </label>
+                <label style="flex:1;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:0.88rem">
+                  <input type="radio" name="tipoChalet" value="adosado" style="width:auto">
+                  <span><strong>Adosado / Pareado</strong> — Comparte medianera</span>
+                </label>
+              </div>
+              <p style="font-size:0.75rem;color:#999;margin-top:6px">Adosado/Pareado activa aislamiento acustico de medianera (CTE DB-HR)</p>
+            </div>
+
             <!-- Tiene gotelé -->
             <div class="field" id="goteleField" style="display:none">
               <label class="field-label" for="tieneGotele">¿Las paredes tienen gotelé a eliminar?</label>
