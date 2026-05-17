@@ -124,10 +124,11 @@ window.goToStep2 = async () => {
   const numViviendas = parseInt(document.getElementById('numViviendas')?.value || '10');
   const nivelRampa = document.getElementById('nivelRampa')?.value || 'medio';
   const tieneGotele = document.getElementById('tieneGotele')?.value || 'no';
+  const tipoConstruccion = document.getElementById('tipoConstruccion')?.value || 'aislado';
   const anioConstruccion = parseInt(document.getElementById('anioConstruccion')?.value || '2000');
   const bajantesAntiguas = anioConstruccion < 1995;
   const distribucion = document.querySelector('input[name="distribucion"]:checked')?.value || 'no';
-  AppState.formData = { projectType:tipo, city:ciudad, surface:m2, quality:calidad, details:detalles, companyName:empresa, clientEmail:email, clientPhone:telefono, ivaType, numBanos, distribucion, anioConstruccion, bajantesAntiguas, numViviendas, nivelRampa, cotaCero, tieneGotele, tipoChalet };
+  AppState.formData = { projectType:tipo, city:ciudad, surface:m2, quality:calidad, details:detalles, companyName:empresa, clientEmail:email, clientPhone:telefono, ivaType, numBanos, distribucion, anioConstruccion, bajantesAntiguas, numViviendas, nivelRampa, cotaCero, tieneGotele, tipoConstruccion };
 
   // Show loading state
   setStep(2);
@@ -315,7 +316,7 @@ window.goToStep2 = async () => {
         if (p.id === 'aislamiento_acustico' && calidadState === 'estándar') precioUnitario = 0;
         // Aislamiento acustico en obra_nueva: solo 0 si chalet AISLADO (no adosado/pareado)
         if (p.id === 'aislamiento_acustico' && AppState.formData.projectType === 'obra_nueva') {
-          if (AppState.formData.tipoChalet === 'aislado') precioUnitario = 0;
+          if (AppState.formData.tipoConstruccion === 'aislado') precioUnitario = 0;
           // Si adosado/pareado: mantiene precio normal (comparte medianera con vecino)
         }
         if (p.id === 'foseado_led' && calidadState === 'estándar') precioUnitario = 0;
@@ -692,8 +693,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if(cotaCeroField) cotaCeroField.style.display = tipo === 'comunidad_vecinos' ? 'block' : 'none';
     const goteleField = document.getElementById('goteleField');
     if(goteleField) goteleField.style.display = ['reforma_integral','obra_nueva'].includes(tipo) ? 'block' : 'none';
-    const tipoChaletField = document.getElementById('tipoChaletField');
-    if(tipoChaletField) tipoChaletField.style.display = tipo === 'obra_nueva' ? 'block' : 'none';
+    const tipoConstruccionField = document.getElementById('tipoConstruccionField');
+    if(tipoConstruccionField) tipoConstruccionField.style.display = tipo === 'obra_nueva' ? 'block' : 'none';
     const comCampos = document.getElementById('comunidadCampos');
     if(comCampos) comCampos.style.display = tipo === 'comunidad_vecinos' ? 'block' : 'none';
     // IVA auto para comunidad
