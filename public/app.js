@@ -159,7 +159,7 @@ window.goToStep2 = async () => {
       local_comercial:  ['demolicion_general','gestion_residuos','albanileria_general','falso_techo_pladur','electrica_completa','electrica_cuadro','fontaneria_completa','pavimento_gres','pintura_total','ventana_aluminio','puerta_blindada','split_ac','limpieza_obra','proyecto_arquitecto'],
       oficinas:         ['demolicion_general','gestion_residuos','albanileria_tabique','falso_techo_pladur','electrica_completa','electrica_cuadro','pavimento_gres','pintura_total','split_ac','limpieza_obra','proyecto_arquitecto'],
       fachada:          ['aislamiento_sate','pintura_esmalte','ventana_aluminio','gestion_residuos','limpieza_obra','proyecto_arquitecto'],
-      comunidad_vecinos: ['demolicion_general','gestion_residuos','albanileria_general','rampa_accesibilidad_cte','pasamanos_rampa_inox','electrica_completa','pavimento_gres','alicatado_pared','pintura_total','puerta_blindada','instalacion_videoportero','limpieza_obra','proyecto_arquitecto'],
+      comunidad_vecinos: ['demolicion_general','gestion_residuos','albanileria_general','rampa_accesibilidad_cte','pasamanos_rampa_inox','electrica_completa','alumbrado_emergencia','pavimento_gres','alicatado_pared','pintura_total','puerta_blindada','instalacion_videoportero','buzon_comunitario','felpudo_tecnico','tablon_espejo','limpieza_obra','proyecto_arquitecto'],
       cubierta:         ['aislamiento_sate','gestion_residuos','limpieza_obra','proyecto_arquitecto'],
     };
 
@@ -208,8 +208,12 @@ window.goToStep2 = async () => {
       limpieza_obra: m2n,
       bajantes_viejas: 2, // estimado: 1 bajante bano + 1 bajante cocina
       rampa_accesibilidad_cte: 1, // partida alzada — 1 ud por portal
-      pasamanos_rampa_inox: AppState.formData?.nivelRampa === 'bajo' ? 4 : AppState.formData?.nivelRampa === 'alto' ? 10 : 6, // ml x 2 lados
-      instalacion_videoportero: 1, // precio = fijo(850) + variable(190 x num_viviendas) — calculado en Firestore como base
+      pasamanos_rampa_inox: AppState.formData?.nivelRampa === 'bajo' ? 5.2 : AppState.formData?.nivelRampa === 'alto' ? 11.2 : 7.2, // ml x 2 lados + 1.2ml prolongaciones CTE DB-SUA
+      instalacion_videoportero: 1,
+      buzon_comunitario: 1, // precio = 250 EUR fijo + 50 EUR x num_viviendas
+      felpudo_tecnico: 1, // 1 ud por portal
+      tablon_espejo: 1, // 1 ud por portal
+      alumbrado_emergencia: 1, // 1 ud alzada por portal
       rampa_accesibilidad_cte: 1, // partida alzada (1 ud independiente del m²)
       instalacion_videoportero: 1, // placa fija + monitores por num_viviendas (campo adicional)
       // Climatización por calidad: split=estandar, conductos+caldera=media_alta, aerotermia=premium
@@ -292,6 +296,11 @@ window.goToStep2 = async () => {
           const nv = AppState.formData.numViviendas || 10;
           precioUnitario = 850 + (190 * nv);
         }
+        // Buzon comunitario: precio dinamico = 250 fijo + 50 * num_viviendas
+        if (p.id === 'buzon_comunitario') {
+          const nv = AppState.formData.numViviendas || 10;
+          precioUnitario = 250 + (50 * nv);
+        }
         // Rampa accesibilidad: precio por desnivel (independiente de calidad estetica)
         if (p.id === 'rampa_accesibilidad_cte') {
           const nr = AppState.formData.nivelRampa || 'medio';
@@ -301,6 +310,12 @@ window.goToStep2 = async () => {
         if (p.id === 'suelo_flotante_acustico' && calidadState === 'estándar') precioUnitario = 0;
         if (p.id === 'aislamiento_cubierta') precioUnitario = 0;
         let nombrePartida = PRECIOS_DB[p.id].nombre;
+        // Portal: cantidades correctas para paramentos verticales (perimetro x altura)
+        if (AppState.formData.projectType === 'comunidad_vecinos') {
+          const m2Portal = parseFloat(AppState.formData.surface) || 20;
+          if (p.id === 'alicatado_pared') p = {...p, cantidad: Math.round(Math.sqrt(m2Portal) * 4 * 2.5)};
+          if (p.id === 'pintura_total') p = {...p, cantidad: Math.round(Math.sqrt(m2Portal) * 4 * 2.5)};
+        }
         // Texto dinamico pavimento gres en portal segun calidad
         if (p.id === 'pavimento_gres' && AppState.formData.projectType === 'comunidad_vecinos') {
           nombrePartida = calidadState === 'premium'
