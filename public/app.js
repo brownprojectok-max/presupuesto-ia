@@ -124,8 +124,6 @@ window.goToStep2 = async () => {
   const numViviendas = parseInt(document.getElementById('numViviendas')?.value || '10');
   const nivelRampa = document.getElementById('nivelRampa')?.value || 'medio';
   const anioConstruccion = parseInt(document.getElementById('anioConstruccion')?.value || '2000');
-  const numViviendas = parseInt(document.getElementById('numViviendas')?.value || '8');
-  const nivelRampa = document.getElementById('nivelRampa')?.value || 'no';
   const bajantesAntiguas = anioConstruccion < 1995;
   const distribucion = document.querySelector('input[name="distribucion"]:checked')?.value || 'no';
   AppState.formData = { projectType:tipo, city:ciudad, surface:m2, quality:calidad, details:detalles, companyName:empresa, clientEmail:email, clientPhone:telefono, ivaType, numBanos, distribucion, anioConstruccion, bajantesAntiguas, numViviendas, nivelRampa };
@@ -299,17 +297,9 @@ window.goToStep2 = async () => {
           const nr = AppState.formData.nivelRampa || 'medio';
           precioUnitario = nr === 'bajo' ? 1400 : nr === 'alto' ? 3500 : 2200;
         }
-        // Suelo flotante acustico: premium automatico, media-alta opcional (precio activo siempre que la partida exista)
+        // Suelo flotante acustico: 0 en estandar
         if (p.id === 'suelo_flotante_acustico' && calidadState === 'estándar') precioUnitario = 0;
-        if (p.id === 'aislamiento_cubierta') precioUnitario = 0; // solo si usuario marca ático
-        if (p.id === 'instalacion_videoportero') {
-          const nv = AppState.formData.numViviendas || 8;
-          precioUnitario = 850 + (190 * nv); // 850 EUR placa fija + 190 EUR/vivienda
-        }
-        if (p.id === 'rampa_accesibilidad_cte') {
-          const nr = AppState.formData.nivelRampa || 'no';
-          precioUnitario = nr === 'no' ? 0 : nr === 'bajo' ? 1600 : nr === 'alto' ? 2800 : 2200;
-        }
+        if (p.id === 'aislamiento_cubierta') precioUnitario = 0;
         let nombrePartida = PRECIOS_DB[p.id].nombre;
         // Texto dinamico pavimento gres en portal segun calidad
         if (p.id === 'pavimento_gres' && AppState.formData.projectType === 'comunidad_vecinos') {
