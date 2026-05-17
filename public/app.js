@@ -153,13 +153,13 @@ window.goToStep2 = async () => {
       reforma_parcial:  ['demolicion_general','gestion_residuos','albanileria_general','electrica_completa','pavimento_parquet','pintura_total','puerta_paso','limpieza_obra'],
       // Obra nueva: sin fontaneria_completa ni electrica_cuadro por misma razón
       obra_nueva:       ['demolicion_general','gestion_residuos','albanileria_general','ayudas_albanileria','albanileria_tabique','aislamiento_trasdosado','aislamiento_acustico','suelo_flotante_acustico','falso_techo_pladur','foseado_led','electrica_completa','fontaneria_bano','fontaneria_cocina','pavimento_parquet','alicatado_pared','pintura_total','ventana_aluminio','puerta_paso','puerta_blindada','split_ac','clima_conductos','caldera_condensacion','aerotermia','suelo_radiante_agua','bano_ducha_italiano','bano_sanitarios','bano_mampara','bano_griferia','cocina_muebles','cocina_encimera_silestone','limpieza_obra','proyecto_arquitecto'],
-      reforma_bano:     ['demolicion_general','gestion_residuos','albanileria_enfoscado','electrica_enchufe','fontaneria_bano','alicatado_pared','bano_ducha_italiano','bano_sanitarios','bano_mampara','bano_griferia','bajantes_viejas','limpieza_obra'],
-      reforma_cocina:   ['demolicion_general','gestion_residuos','albanileria_enfoscado','electrica_enchufe','electrica_punto_luz','fontaneria_cocina','alicatado_pared','cocina_muebles','cocina_encimera_silestone','bajantes_viejas','limpieza_obra'],
+      reforma_bano:     ['demolicion_general','gestion_residuos','albanileria_enfoscado','electrica_enchufe','fontaneria_bano','alicatado_pared','solado_ceramico_bano','bano_ducha_italiano','bano_sanitarios','bano_mampara','bano_griferia','bajantes_viejas','limpieza_obra'],
+      reforma_cocina:   ['demolicion_general','gestion_residuos','albanileria_enfoscado','electrica_enchufe','electrica_punto_luz','fontaneria_cocina','alicatado_pared','solado_ceramico_cocina','cocina_muebles','cocina_encimera_silestone','bajantes_viejas','limpieza_obra'],
       // Local comercial: mantiene cuadro separado (es un concepto distinto en locales)
       local_comercial:  ['demolicion_general','gestion_residuos','albanileria_general','falso_techo_pladur','electrica_completa','electrica_cuadro','fontaneria_completa','pavimento_gres','pintura_total','ventana_aluminio','puerta_blindada','split_ac','limpieza_obra','proyecto_arquitecto'],
       oficinas:         ['demolicion_general','gestion_residuos','albanileria_tabique','falso_techo_pladur','electrica_completa','electrica_cuadro','pavimento_gres','pintura_total','split_ac','limpieza_obra','proyecto_arquitecto'],
       fachada:          ['aislamiento_sate','pintura_esmalte','ventana_aluminio','gestion_residuos','limpieza_obra','proyecto_arquitecto'],
-      comunidad_vecinos: ['demolicion_general','gestion_residuos','albanileria_general','rampa_accesibilidad_cte','pasamanos_rampa_inox','electrica_completa','alumbrado_emergencia','pavimento_gres','alicatado_pared','pintura_total','puerta_blindada','instalacion_videoportero','buzon_comunitario','felpudo_tecnico','tablon_espejo','limpieza_obra','proyecto_arquitecto'],
+      comunidad_vecinos: ['demolicion_general','gestion_residuos','albanileria_general','rampa_accesibilidad_cte','pasamanos_rampa_inox','electrica_completa','alumbrado_emergencia','pavimento_gres','alicatado_pared','pintura_total','puerta_blindada','control_accesos','instalacion_videoportero','buzon_comunitario','felpudo_tecnico','tablon_espejo','proteccion_ascensor','limpieza_obra','proyecto_arquitecto'],
       cubierta:         ['aislamiento_sate','gestion_residuos','limpieza_obra','proyecto_arquitecto'],
     };
 
@@ -170,7 +170,7 @@ window.goToStep2 = async () => {
     const m2Pared = Math.round(m2n * 2.8);
     const tabiqueriaPct = distribucion === 'si' ? 0.85 : 0.05; // 85% redistribucion completa, 5% solo rozas
     const mlEncimera = Math.max(4, Math.round(m2n * 0.07));
-    const alicatadoTotal = Math.round((25 * numBanos) + (mlEncimera * 0.60)); // 25m²/baño + frente cocina
+    const alicatadoTotal = Math.round((25 * numBanos) + (mlEncimera * 0.60) + (6 * numBanos) + 8); // paredes (25m2/bano + frente cocina) + suelos (6m2/bano + 8m2 cocina)
     const aislamientoCTE = Math.round(m2n * 0.45); // perimetro fachada interior segun aparejador
 
     // Cantidades calculadas matemáticamente — deterministas, sin variabilidad
@@ -210,8 +210,14 @@ window.goToStep2 = async () => {
       rampa_accesibilidad_cte: 1, // partida alzada — 1 ud por portal
       pasamanos_rampa_inox: AppState.formData?.nivelRampa === 'bajo' ? 5.2 : AppState.formData?.nivelRampa === 'alto' ? 11.2 : 7.2, // ml x 2 lados + 1.2ml prolongaciones CTE DB-SUA
       instalacion_videoportero: 1,
-      buzon_comunitario: 1, // precio = 250 EUR fijo + 50 EUR x num_viviendas
-      felpudo_tecnico: 1, // 1 ud por portal
+      buzon_comunitario: 1,
+      solado_ceramico_bano: 6 * numBanos, // suelo bano estimado 6m2/bano
+      solado_ceramico_cocina: 8, // suelo cocina estimado 8m2 fijo
+      control_accesos: 1,
+      proteccion_ascensor: 1,
+      felpudo_tecnico: 1,
+      control_accesos: 1, // lector RFID/teclado numerico — 1 ud por portal
+      proteccion_ascensor: 1, // tableros madera/policel — 1 ud por reforma
       tablon_espejo: 1, // 1 ud por portal
       alumbrado_emergencia: 1, // 1 ud alzada por portal
       rampa_accesibilidad_cte: 1, // partida alzada (1 ud independiente del m²)
@@ -314,7 +320,7 @@ window.goToStep2 = async () => {
         if (AppState.formData.projectType === 'comunidad_vecinos') {
           const m2Portal = parseFloat(AppState.formData.surface) || 20;
           if (p.id === 'alicatado_pared') p = {...p, cantidad: Math.round(Math.sqrt(m2Portal) * 4 * 2.5)};
-          if (p.id === 'pintura_total') p = {...p, cantidad: Math.round(Math.sqrt(m2Portal) * 4 * 2.5)};
+          if (p.id === 'pintura_total') p = {...p, cantidad: Math.round(Math.sqrt(m2Portal) * 4 * 2.5 + m2Portal)}; // paredes + techo
         }
         // Texto dinamico pavimento gres en portal segun calidad
         if (p.id === 'pavimento_gres' && AppState.formData.projectType === 'comunidad_vecinos') {
