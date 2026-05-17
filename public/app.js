@@ -207,7 +207,7 @@ window.goToStep2 = async () => {
       bano_griferia: numBanos,
       aislamiento_trasdosado: aislamientoCTE,
       cocina_muebles: Math.max(4, Math.min(7, Math.round(m2n * 0.07))), // cap 7ml
-      cocina_encimera_silestone: Math.max(3, Math.min(7, Math.round(m2n * 0.05))), // cap 7ml — igual que muebles para no dejar encimera descubierta
+      cocina_encimera_silestone: Math.max(3, Math.min(7, Math.round(m2n * 0.07))), // mismo coef 0.07 que muebles — cap 7ml
       split_ac: Math.max(1, Math.round(m2n / 25)),
       aislamiento_sate: m2n,
       limpieza_obra: m2n,
@@ -296,12 +296,19 @@ window.goToStep2 = async () => {
         if (p.id === 'pintura_total') {
           const precioBaseCalidad = getPrecio('pintura_total', calidad);
           const tieneGotele = AppState.formData.tieneGotele === 'si';
-          if (tieneGotele) {
-            precioUnitario = precioBaseCalidad + 12; // saneado integral incluye redistrib
+          if (tieneGotele && distribucionState === 'si') {
+            // Gotele + redistribucion: paramentos viejos rascados + juntas tabiques nuevos
+            // base*1.25 por rozas y juntas + suplemento gotele, minimo 38 EUR/m2
+            precioUnitario = Math.max(38, Math.round(precioBaseCalidad * 1.25) + 12);
+          } else if (tieneGotele) {
+            // Solo gotele: rascado + doble plaste + lijado + imprimacion + pintura
+            // minimo 35 EUR/m2 (mercado Madrid 2026, aparejador v17)
+            precioUnitario = Math.max(35, precioBaseCalidad + 12);
           } else if (distribucionState === 'si') {
-            precioUnitario = Math.round(precioBaseCalidad * 1.25); // solo rozas y tendidos
+            // Solo redistribucion: rozas, tendidos, juntas paramentos nuevos
+            precioUnitario = Math.round(precioBaseCalidad * 1.25);
           } else {
-            precioUnitario = precioBaseCalidad; // pintura sobre paramento existente liso
+            precioUnitario = precioBaseCalidad;
           }
         }
         // Climatización: split solo para estándar, conductos+caldera para media_alta, aerotermia para premium
