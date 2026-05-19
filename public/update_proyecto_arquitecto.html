@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PresupuestoIA — Actualizar proyecto_arquitecto v18</title>
+<style>
+  :root {
+    --blue:    #2d4a8a;
+    --blue-lt: #3a5fa8;
+    --green:   #16a34a;
+    --red:     #dc2626;
+    --bg:      #f0f4ff;
+    --card:    #ffffff;
+    --border:  #d1d9ef;
+    --text:    #1e2d4a;
+    --muted:   #64748b;
+    --mono:    'Courier New', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 16px;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(45,74,138,.10);
+    padding: 36px 40px;
+    width: 100%;
+    max-width: 720px;
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo-badge {
+    background: var(--blue);
+    color: white;
+    font-weight: 700;
+    font-size: 0.78rem;
+    padding: 6px 12px;
+    border-radius: 6px;
+    letter-spacing: .5px;
+  }
+
+  .header-text h1 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--blue);
+  }
+  .header-text p {
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .section-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  .info-box {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 0.84rem;
+    color: #1d4ed8;
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+
+  .field-block {
+    margin-bottom: 22px;
+  }
+
+  .field-block label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+  .field-block label span {
+    font-weight: 400;
+    color: var(--muted);
+    font-size: 0.78rem;
+    margin-left: 6px;
+  }
+
+  .code-block {
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-family: var(--mono);
+    font-size: 0.80rem;
+    color: #374151;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 160px;
+    overflow-y: auto;
+  }
+
+  .new-text-box {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-family: var(--mono);
+    font-size: 0.80rem;
+    color: #14532d;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 220px;
+    overflow-y: auto;
+  }
+
+  .diff-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  @media (max-width: 600px) {
+    .diff-row { grid-template-columns: 1fr; }
+    .card { padding: 24px 20px; }
+  }
+
+  .btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: background .15s, transform .1s;
+  }
+  .btn:active { transform: scale(.98); }
+  .btn-primary { background: var(--blue); color: white; }
+  .btn-primary:hover { background: var(--blue-lt); }
+  .btn-primary:disabled { background: #94a3b8; cursor: not-allowed; transform: none; }
+
+  .status {
+    margin-top: 18px;
+    padding: 14px 16px;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    display: none;
+    align-items: flex-start;
+    gap: 10px;
+    line-height: 1.5;
+  }
+  .status.ok  { background: #dcfce7; border: 1px solid #86efac; color: var(--green); display: flex; }
+  .status.err { background: #fee2e2; border: 1px solid #fca5a5; color: var(--red);   display: flex; }
+  .status.run { background: #eff6ff; border: 1px solid #bfdbfe; color: #1d4ed8;     display: flex; }
+
+  .spinner {
+    width: 18px; height: 18px;
+    border: 2.5px solid #bfdbfe;
+    border-top-color: #1d4ed8;
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    flex-shrink: 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .meta-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.81rem;
+    margin-bottom: 24px;
+  }
+  .meta-table td {
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+  }
+  .meta-table td:first-child { color: var(--text); font-weight: 600; width: 160px; }
+  .meta-table tr:last-child td { border-bottom: none; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="header">
+    <div class="logo-badge">PresupuestoIA</div>
+    <div class="header-text">
+      <h1>Actualizar <code>proyecto_arquitecto</code></h1>
+      <p>Herramienta admin — Base de datos v18 · Firebase Firestore</p>
+    </div>
+  </div>
+
+  <div class="info-box">
+    ℹ️ Esta herramienta actualiza <strong>descripcion</strong> y <strong>media_alta</strong> del documento
+    <strong>proyecto_arquitecto</strong> en la colección <code>precios_construccion</code>.<br>
+    Precio: <strong>6.000 EUR → 7.500 EUR</strong> media-alta (validado por aparejador colegiado, Gemini v18).<br>
+    Texto contractual: alcance explícito con exclusiones de fianzas municipales.
+  </div>
+
+  <p class="section-label">Metadatos del documento</p>
+  <table class="meta-table">
+    <tr><td>Colección</td><td><code>precios_construccion</code></td></tr>
+    <tr><td>Documento ID</td><td><code>proyecto_arquitecto</code></td></tr>
+    <tr><td>Campos actualizados</td><td><code>descripcion</code> + <code>media_alta</code></td></tr>
+    <tr><td>Precio media-alta ANTERIOR</td><td><code>6.000 EUR</code></td></tr>
+    <tr><td>Precio media-alta NUEVO</td><td><code>7.500 EUR</code> ← validado Gemini v18</td></tr>
+    <tr><td>Validado por</td><td>Aparejador colegiado · Gemini · v18</td></tr>
+  </table>
+
+  <div class="diff-row">
+    <div class="field-block">
+      <label>Texto ANTERIOR <span>(referencia)</span></label>
+      <div class="code-block">Proyecto técnico de arquitecto: redacción del proyecto básico y de ejecución, dirección facultativa de obra y visado colegial. Precio medio-alto orientativo: 6.000 €. NOTA: El ICIO y las tasas de la ECA son costes municipales que abona directamente la propiedad.</div>
+    </div>
+    <div class="field-block">
+      <label>Texto NUEVO <span>(se escribirá en Firestore)</span></label>
+      <div class="new-text-box" id="newTextPreview"></div>
+    </div>
+  </div>
+
+  <button class="btn btn-primary" id="btnUpdate" onclick="runUpdate()">
+    <span>Ejecutar actualización en Firestore (precio + descripción)</span>
+  </button>
+
+  <div class="status" id="status"></div>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseApp = initializeApp({
+    apiKey:            "AIzaSyArUe9NXi6YMDvFCWStzgm0Yhn_wfUbF9o",
+    authDomain:        "presupuesto-ia-594b9.firebaseapp.com",
+    projectId:         "presupuesto-ia-594b9",
+    storageBucket:     "presupuesto-ia-594b9.firebasestorage.app",
+    messagingSenderId: "78219000130",
+    appId:             "1:78219000130:web:a169de0c7be56dda8870db"
+  });
+  const db = getFirestore(firebaseApp);
+
+  // ── Nuevo texto contractual (Gemini v18) ────────────────────────
+  const NUEVO_TEXTO =
+    "Proyecto técnico de arquitecto: redacción del proyecto básico y de ejecución, " +
+    "dirección facultativa de obra y visado colegial. " +
+    "Incluye honorarios de dirección facultativa, tasas ECA e ICIO. " +
+    "Excluye fianzas municipales por gestión de residuos y tasas de ocupación " +
+    "de vía pública (contenedores). " +
+    "Precio orientativo media-alta: 7.500 € para reforma integral ~75 m² en Madrid (Mayo 2026).";
+
+  const NUEVO_PRECIO_MEDIA_ALTA = 7500;
+
+  // Mostrar preview
+  document.getElementById('newTextPreview').textContent = NUEVO_TEXTO;
+
+  // ── Función principal ───────────────────────────────────────────
+  window.runUpdate = async () => {
+    const btn    = document.getElementById('btnUpdate');
+
+    btn.disabled = true;
+    btn.innerHTML = '<div class="spinner"></div><span>Conectando con Firestore…</span>';
+
+    setStatus('run', '<div class="spinner"></div>', 'Comprobando documento actual…');
+
+    try {
+      const ref = doc(db, 'precios_construccion', 'proyecto_arquitecto');
+
+      const snap = await getDoc(ref);
+      if (!snap.exists()) {
+        throw new Error('El documento proyecto_arquitecto no existe en Firestore. Verifica la colección.');
+      }
+      const current = snap.data();
+
+      setStatus('run', '<div class="spinner"></div>',
+        `Documento encontrado. Precio actual media_alta: ${current.media_alta ?? '—'} €. Actualizando a 7.500 €…`);
+
+      // Actualizar descripcion + media_alta
+      await updateDoc(ref, {
+        descripcion: NUEVO_TEXTO,
+        media_alta: NUEVO_PRECIO_MEDIA_ALTA
+      });
+
+      // Verificar escritura
+      const verify = await getDoc(ref);
+      const vData = verify.data();
+      if (vData.descripcion !== NUEVO_TEXTO || vData.media_alta !== NUEVO_PRECIO_MEDIA_ALTA) {
+        throw new Error('La verificación post-escritura falló. Reintenta.');
+      }
+
+      setStatus('ok', '✅',
+        `Actualización completada correctamente (v18).<br>
+         <span style="font-weight:400">
+           <code>descripcion</code>: texto contractual Gemini aplicado.<br>
+           <code>media_alta</code>: <strong>6.000 € → 7.500 €</strong> ✓<br>
+           Ya puedes cerrar esta ventana.
+         </span>`);
+
+      btn.innerHTML = '<span>✅ Completado — v18</span>';
+
+    } catch (err) {
+      setStatus('err', '❌', `Error: ${err.message}`);
+      btn.disabled = false;
+      btn.innerHTML = '<span>Reintentar actualización</span>';
+    }
+  };
+
+  function setStatus(type, icon, msg) {
+    const el = document.getElementById('status');
+    el.className = 'status ' + type;
+    el.innerHTML = `${icon}<div>${msg}</div>`;
+  }
+</script>
+
+</body>
+</html>
