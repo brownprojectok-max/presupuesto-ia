@@ -279,7 +279,7 @@ window.goToStep2 = async () => {
 
     // Ajuste de precio unitario según condiciones del proyecto
     const distribucionState = AppState.formData.distribucion || 'no';
-    const calidadState = AppState.formData.quality || 'media-alta';
+    const calidadState = AppState.formData.quality || 'media_alta';
 
     AppState.lineItems = finalArr
       .filter(p => PRECIOS_DB[p.id])
@@ -310,12 +310,12 @@ window.goToStep2 = async () => {
             precioUnitario = precioBaseCalidad;
           }
         }
-        // Climatización: split solo para estándar, conductos+caldera para media_alta, aerotermia para premium
-        // Split: solo estándar
-        if (p.id === 'split_ac' && (calidadState === 'media-alta' || calidadState === 'premium')) precioUnitario = 0;
-        // Conductos+caldera: solo media-alta (0 en estándar Y en premium)
-        if (p.id === 'clima_conductos' && calidadState !== 'media-alta') precioUnitario = 0;
-        if (p.id === 'caldera_condensacion' && calidadState !== 'media-alta') precioUnitario = 0;
+        // Climatización: split solo para estandar, conductos+caldera para media_alta, aerotermia para premium
+        // [FIX v19] calidadState usa guión bajo (media_alta) igual que el value del select HTML
+        if (p.id === 'split_ac' && (calidadState === 'media_alta' || calidadState === 'premium')) precioUnitario = 0;
+        // Conductos+caldera: solo media_alta (0 en estandar Y en premium)
+        if (p.id === 'clima_conductos' && calidadState !== 'media_alta') precioUnitario = 0;
+        if (p.id === 'caldera_condensacion' && calidadState !== 'media_alta') precioUnitario = 0;
         // Aerotermia+suelo radiante: solo premium
         if (p.id === 'aerotermia' && calidadState !== 'premium') precioUnitario = 0;
         if (p.id === 'suelo_radiante_agua' && calidadState !== 'premium') precioUnitario = 0;
