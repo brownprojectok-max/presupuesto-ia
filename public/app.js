@@ -128,6 +128,7 @@ window.goToStep2 = async () => {
   const anioConstruccion = parseInt(document.getElementById('anioConstruccion')?.value || '2000');
   const bajantesAntiguas = anioConstruccion < 1995;
   const distribucion = document.querySelector('input[name="distribucion"]:checked')?.value || 'no';
+  const cotaCero = document.getElementById('cotaCero')?.value || 'no';
   AppState.formData = { projectType:tipo, city:ciudad, surface:m2, quality:calidad, details:detalles, companyName:empresa, clientEmail:email, clientPhone:telefono, ivaType, numBanos, distribucion, anioConstruccion, bajantesAntiguas, numViviendas, nivelRampa, cotaCero, tieneGotele, tipoConstruccion };
 
   // Show loading state
