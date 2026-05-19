@@ -207,7 +207,8 @@ window.goToStep2 = async () => {
       bano_griferia: numBanos,
       aislamiento_trasdosado: aislamientoCTE,
       cocina_muebles: Math.max(4, Math.min(7, Math.round(m2n * 0.07))), // cap 7ml
-      cocina_encimera_silestone: Math.max(3, Math.min(7, Math.round(m2n * 0.07))), // mismo coef 0.07 que muebles — cap 7ml
+      // [FIX v18 Gemini] min=4 (igual que muebles) — evita módulo sin encimera en pisos ≤30m²
+      cocina_encimera_silestone: Math.max(4, Math.min(7, Math.round(m2n * 0.07))),
       split_ac: Math.max(1, Math.round(m2n / 25)),
       aislamiento_sate: m2n,
       limpieza_obra: m2n,
@@ -222,12 +223,9 @@ window.goToStep2 = async () => {
       control_accesos: 1,
       proteccion_ascensor: 1,
       felpudo_tecnico: 1,
-      control_accesos: 1,
-      proteccion_ascensor: 1,
       bajada_cota_cero: 0, // partida opcional — se activa si usuario marca checkbox en formulario
       tablon_espejo: 1, // 1 ud por portal
       alumbrado_emergencia: 1, // 1 ud alzada por portal
-      rampa_accesibilidad_cte: 1, // partida alzada (1 ud independiente del m²)
       instalacion_videoportero: 1, // placa fija + monitores por num_viviendas (campo adicional)
       // Climatización por calidad: split=estandar, conductos+caldera=media_alta, aerotermia=premium
       // Cantidad 1 para todos — el precio unitario refleja la calidad (0€ si no aplica a esa calidad)
