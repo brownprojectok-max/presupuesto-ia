@@ -51,7 +51,7 @@ body {
   display: flex;
   flex-direction: column;
   line-height: 1.6;
-  font-size: 13px;
+  font-size: 14px;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -134,7 +134,7 @@ body {
 .stepper-inner {
   max-width: 700px;
   margin: 0 auto;
-  padding: 0.6rem 1.5rem;
+  padding: 0.8rem 1.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -200,7 +200,7 @@ body {
 .main-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 1.2rem 1.5rem 2rem;
+  padding: 1.6rem 1.5rem 2.5rem;
   flex: 1;
   width: 100%;
 }
@@ -216,7 +216,7 @@ body {
 
 /* ─── SECTION HEADER ─── */
 .section-header {
-  margin-bottom: 1.2rem;
+  margin-bottom: 1.6rem;
 }
 .section-title {
   font-size: 1.4rem;
@@ -243,7 +243,7 @@ body {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.9rem 1.2rem;
+  padding: 1.1rem 1.4rem;
   border-bottom: 1px solid var(--gray-100);
   background: var(--gray-50);
 }
@@ -259,15 +259,15 @@ body {
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  margin-bottom: 1.2rem;
+  gap: 1.3rem;
+  margin-bottom: 1.6rem;
 }
 @media (max-width: 900px) {
   .form-grid { grid-template-columns: 1fr; }
 }
 
 .form-card { display: flex; flex-direction: column; }
-.form-card .card-body { flex: 1; display: flex; flex-direction: column; gap: 0.85rem; }
+.form-card .card-body { flex: 1; display: flex; flex-direction: column; gap: 1rem; }
 
 /* ─── FORM FIELDS ─── */
 .field-group {
@@ -297,7 +297,7 @@ body {
   background: var(--white);
   border: 1.5px solid var(--gray-200);
   border-radius: var(--radius-sm);
-  padding: 0.5rem 0.8rem;
+  padding: 0.6rem 0.85rem;
   width: 100%;
   transition: border-color var(--transition), box-shadow var(--transition);
   outline: none;
@@ -777,7 +777,7 @@ body {
   margin-top: 1.5rem;
 }
 .totals-grid {
-  padding: 1.1rem;
+  padding: 1.3rem;
   display: flex;
   flex-direction: column;
   gap: 0.85rem;
@@ -805,7 +805,7 @@ body {
 .totals-row-total {
   background: var(--navy);
   margin: 0 -1.5rem -1.5rem;
-  padding: 0.9rem 1.2rem;
+  padding: 1.1rem 1.4rem;
   border-radius: 0 0 var(--radius-lg) var(--radius-lg);
 }
 .totals-label-total {
@@ -966,7 +966,7 @@ body {
 /* ─── FOOTER ─── */
 .footer {
   background: var(--navy);
-  padding: 1.1rem;
+  padding: 1.3rem;
   margin-top: auto;
 }
 .footer-inner {
