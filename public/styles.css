@@ -51,7 +51,7 @@ body {
   display: flex;
   flex-direction: column;
   line-height: 1.6;
-  font-size: 15px;
+  font-size: 13px;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -67,7 +67,7 @@ body {
 .navbar-inner {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 1.2rem;
   height: 64px;
   display: flex;
   align-items: center;
@@ -81,11 +81,11 @@ body {
   text-decoration: none;
 }
 .logo-icon {
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   filter: drop-shadow(0 0 6px rgba(245,158,11,.6));
 }
 .logo-text {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   font-weight: 700;
   color: var(--white);
   letter-spacing: -0.5px;
@@ -134,7 +134,7 @@ body {
 .stepper-inner {
   max-width: 700px;
   margin: 0 auto;
-  padding: 1rem 1.5rem;
+  padding: 0.6rem 1.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -200,7 +200,7 @@ body {
 .main-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem 1.5rem 3rem;
+  padding: 1.2rem 1.5rem 2rem;
   flex: 1;
   width: 100%;
 }
@@ -216,10 +216,10 @@ body {
 
 /* ─── SECTION HEADER ─── */
 .section-header {
-  margin-bottom: 2rem;
+  margin-bottom: 1.2rem;
 }
 .section-title {
-  font-size: 1.75rem;
+  font-size: 1.4rem;
   font-weight: 800;
   color: var(--navy);
   letter-spacing: -0.5px;
@@ -243,7 +243,7 @@ body {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 1.25rem 1.5rem;
+  padding: 0.9rem 1.2rem;
   border-bottom: 1px solid var(--gray-100);
   background: var(--gray-50);
 }
@@ -259,15 +259,15 @@ body {
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-  margin-bottom: 2rem;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
 }
 @media (max-width: 900px) {
   .form-grid { grid-template-columns: 1fr; }
 }
 
 .form-card { display: flex; flex-direction: column; }
-.form-card .card-body { flex: 1; display: flex; flex-direction: column; gap: 1.2rem; }
+.form-card .card-body { flex: 1; display: flex; flex-direction: column; gap: 0.85rem; }
 
 /* ─── FORM FIELDS ─── */
 .field-group {
@@ -297,7 +297,7 @@ body {
   background: var(--white);
   border: 1.5px solid var(--gray-200);
   border-radius: var(--radius-sm);
-  padding: 0.65rem 0.9rem;
+  padding: 0.5rem 0.8rem;
   width: 100%;
   transition: border-color var(--transition), box-shadow var(--transition);
   outline: none;
@@ -777,7 +777,7 @@ body {
   margin-top: 1.5rem;
 }
 .totals-grid {
-  padding: 1.5rem;
+  padding: 1.1rem;
   display: flex;
   flex-direction: column;
   gap: 0.85rem;
@@ -805,7 +805,7 @@ body {
 .totals-row-total {
   background: var(--navy);
   margin: 0 -1.5rem -1.5rem;
-  padding: 1.25rem 1.5rem;
+  padding: 0.9rem 1.2rem;
   border-radius: 0 0 var(--radius-lg) var(--radius-lg);
 }
 .totals-label-total {
@@ -966,7 +966,7 @@ body {
 /* ─── FOOTER ─── */
 .footer {
   background: var(--navy);
-  padding: 1.5rem;
+  padding: 1.1rem;
   margin-top: auto;
 }
 .footer-inner {
