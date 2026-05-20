@@ -134,7 +134,7 @@ body {
 .stepper-inner {
   max-width: 700px;
   margin: 0 auto;
-  padding: 0.3rem 1.5rem;
+  padding: 0.75rem 1.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -182,7 +182,7 @@ body {
   background: var(--navy);
   border-color: var(--navy);
   color: var(--white);
-  animation: stepGlow 1.5s ease-in-out infinite;
+  animation: stepGlow 2s ease-in-out infinite;
 }
 .step.active .step-label { color: var(--navy); font-weight: 600; }
 
