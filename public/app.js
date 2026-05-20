@@ -96,6 +96,9 @@ function setStep(n) {
     else if (i + 1 === n) el.classList.add('active');
   });
   AppState.currentStep = n;
+  // Mostrar/ocultar botón "Nuevo presupuesto" — solo visible desde paso 2
+  const btnNew = document.getElementById('newBudgetBtn');
+  if (btnNew) btnNew.style.display = n >= 2 ? 'inline-flex' : 'none';
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -614,6 +617,16 @@ window.newBudget = () => {
   AppState.budgetMeta = {};
   document.getElementById('aiLoading').style.display = 'flex';
   document.getElementById('aiResult').style.display = 'none';
+  // Limpiar todos los campos del formulario visualmente
+  ['projectType','city','surface','quality','details','companyName','clientEmail','clientPhone'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  const dist = document.querySelector('input[name="distribucion"][value="no"]');
+  if (dist) dist.checked = true;
+  const estimateEl = document.getElementById('estimatePreview');
+  if (estimateEl) estimateEl.style.display = 'none';
+  const qualityPreview = document.getElementById('qualityPreview');
+  if (qualityPreview) qualityPreview.style.display = 'none';
   setStep(1);
 };
 
